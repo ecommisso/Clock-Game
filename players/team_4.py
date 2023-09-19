@@ -3,7 +3,6 @@ import numpy as np
 from typing import Tuple, List
 import json
 
-
 class Player:
     def __init__(self, rng: np.random.Generator) -> None:
         """Initialise the player with given skill.
@@ -22,11 +21,13 @@ class Player:
 
     def ev(self, constraints: list, hand: str):
         value = dict()
+        # evaluating the expected payoff of each constraint
         for constraint in constraints:
             p = 1.0
             for letter in hand:
                 idx = constraint.find(letter)
                 if idx!=-1:
+                    uselessletters.discard(letter)
                     if (idx>0 and constraint[idx-1] not in hand)\
                     and (idx<len(constraint)-1 and constraint[idx+1] not in hand):
                         p *= 0.94
@@ -63,7 +64,6 @@ class Player:
             if ev <= 0:
                 discard_constraints.append(json.loads(constraint))
 
-        return discard_constraints
 
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
     def play(self, cards, constraints, state, territory):
