@@ -1,6 +1,8 @@
 from tokenize import String
 import numpy as np
 from typing import Tuple, List
+import json
+
 
 class Player:
     def __init__(self, rng: np.random.Generator) -> None:
@@ -18,16 +20,13 @@ class Player:
         """
         self.rng = rng
 
-    def ev(constraints: list, hand: str):
+    def ev(self, constraints: list, hand: str):
         value = dict()
-        what2keep = list()
-        # evaluating the expected payoff of each constraint
         for constraint in constraints:
             p = 1.0
             for letter in hand:
                 idx = constraint.find(letter)
                 if idx!=-1:
-                    uselessletters.discard(letter)
                     if (idx>0 and constraint[idx-1] not in hand)\
                     and (idx<len(constraint)-1 and constraint[idx+1] not in hand):
                         p *= 0.94
@@ -36,20 +35,12 @@ class Player:
                     p *= 10/23
                 else:
                     p *= 0.98
-            #print(f"constraint: {constraint}")
-            #print(f"p={p:.5f}")
+            print(f"constraint: {constraint}")
+            print(f"p={p:.5f}")
             value[constraint] = 2.0*p-1.0 if len(constraint)==2 else p-1+p*3.0*2**(len(constraint)-3)
-            #print(f"ev={value[constraint]:.5f}")
-            if value[constraint]>0:
-                what2keep.append(constraint)
-        # removing contradicting constraints - how?
+            print(f"ev={value[constraint]:.5f}")
 
-        # returning useless letters
-        uselessletters = {letter for letter in hand}
-        for constraint in what2keep:
-            for letter in constraint:
-                uselessletters.discard(letter)
-        return what2keep, uselessletters
+        return value
     
     #def choose_discard(self, cards: list[str], constraints: list[str]):
     def choose_discard(self, cards, constraints):
@@ -62,10 +53,17 @@ class Player:
         Returns:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
-        constraints = [c.replace("<","") for c in constraints]
-        what2keep,_ = self.ev(constraints, cards)
-        return [constraints.index(c) for c in what2keep]
+        constraints = [json.dumps(c) for c in constraints]
+        value = self.ev(constraints, cards)
+        sorted_constraints_dict = dict(sorted(value.items(), key=lambda item: item[1], reverse=True))
+        print("sorted constraints:", sorted_constraints_dict)
 
+        discard_constraints = []
+        for constraint, ev in sorted_constraints_dict.items():
+            if ev <= 0:
+                discard_constraints.append(json.loads(constraint))
+
+        return discard_constraints
 
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
     def play(self, cards, constraints, state, territory):
@@ -82,7 +80,7 @@ class Player:
             Tuple[int, str]: Return a tuple of slot from 1-12 and letter to be played at that slot
         """
         #Do we want intermediate scores also available? Confirm pls
-        
+
         letter = self.rng.choice(cards)
         territory_array = np.array(territory)
         available_hours = np.where(territory_array == 4)
