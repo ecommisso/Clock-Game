@@ -18,39 +18,6 @@ class Player:
         """
         self.rng = rng
 
-    def ev(self, constraints: list, hand: str):
-        value = dict()
-        what2keep = list()
-        # evaluating the expected payoff of each constraint
-        for constraint in constraints:
-            p = 1.0
-            for letter in hand:
-                idx = constraint.find(letter)
-                if idx!=-1:
-                    uselessletters.discard(letter)
-                    if (idx>0 and constraint[idx-1] not in hand)\
-                    and (idx<len(constraint)-1 and constraint[idx+1] not in hand):
-                        p *= 0.94
-            for idx in range(1,len(constraint)):
-                if (constraint[idx-1] not in hand) and (constraint[idx] not in hand):
-                    p *= 10/23
-                else:
-                    p *= 0.98
-            #print(f"constraint: {constraint}")
-            #print(f"p={p:.5f}")
-            value[constraint] = 2.0*p-1.0 if len(constraint)==2 else p-1+p*3.0*2**(len(constraint)-3)
-            #print(f"ev={value[constraint]:.5f}")
-            if value[constraint]>0:
-                what2keep.append(constraint)
-        # removing contradicting constraints - how?
-
-        # returning useless letters
-        uselessletters = {letter for letter in hand}
-        for constraint in what2keep:
-            for letter in constraint:
-                uselessletters.discard(letter)
-        return what2keep, uselessletters
-    
     #def choose_discard(self, cards: list[str], constraints: list[str]):
     def choose_discard(self, cards, constraints):
         """Function in which we choose which cards to discard, and it also inititalises the cards dealt to the player at the game beginning
@@ -62,9 +29,42 @@ class Player:
         Returns:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
-        constraints = [c.replace("<","") for c in constraints]
-        what2keep,_ = self.ev(constraints, cards)
-        return [constraints.index(c) for c in what2keep]
+        final_constraints = []
+        #print(constraints)
+        symbol_count = 0
+        letter_count = 0
+     
+        for cons_ in constraints:
+            symbol_count = self.check_constraints(cons_)
+            letter_count = self.check_similar(cons_, cards)
+            if symbol_count == 1 and letter_count>0:
+                final_constraints.append(cons_)
+                continue
+            if symbol_count == 2 and letter_count>0:
+                final_constraints.append(cons_)
+                continue
+            if symbol_count == 3 and letter_count>1:
+                final_constraints.append(cons_)
+                continue
+            if symbol_count == 4 and letter_count>2:
+                final_constraints.append(cons_)
+                continue             
+        return final_constraints
+
+    def check_constraints(self, cons_):
+        symbol_count = 0
+        for char in cons_:
+            if char == "<":
+                symbol_count +=1
+        return symbol_count
+
+
+    def check_similar(self, cons_, cards):
+        letter_count = 0
+        for char in cons_:
+            if char in cards:
+                letter_count +=1
+        return letter_count
 
 
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
