@@ -18,7 +18,7 @@ class Player:
         """
         self.rng = rng
 
-    def ev(constraints: list, hand: str):
+    def ev(self, constraints: list, hand: str):
         value = dict()
         what2keep = list()
         # evaluating the expected payoff of each constraint
