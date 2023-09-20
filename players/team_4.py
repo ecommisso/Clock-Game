@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from tokenize import String
 import numpy as np
 from typing import Tuple, List
+<<<<<<< HEAD
 from itertools import tee
 
 @dataclass(order=True)
@@ -31,7 +32,6 @@ class Player:
         n = len(constraint)
 
         return 2.0*p-1.0 if len(constraint)==2 else p-1+p*3.0*2**(len(constraint)-3)
-
     def approx_p(self, cards, constraint):
         p = 1.0
         n = len(constraint)
