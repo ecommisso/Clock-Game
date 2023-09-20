@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from tokenize import String
 import numpy as np
 from typing import Tuple, List
-<<<<<<< HEAD
 from itertools import tee
 
 @dataclass(order=True)
