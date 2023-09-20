@@ -14,11 +14,10 @@ def all_possible_constraints():
     for r in range(2, 6):
         # Generate all possible permutations
         for combo in permutations(letters, r):
-            # Convert the permutation to a sorted string
             joined_combo = '<'.join(combo)
             all_permutations.append(joined_combo)
 
-    # Convert the list of permutations to a set to remove duplicates
+    # Convert the list of permutations to a set to remove any duplicates
     unique_permutations = set(all_permutations)
 
     # Convert the set back to a list
@@ -40,7 +39,7 @@ with open("data.txt", "a+") as file:
 
     if file_contents:   # If the file is not empty, clear its contents and write the data
         file.truncate(0)
-    file.write(str(given_cards))
+    file.write(str(given_cards) + "\n")
 
 tester = Player(np.random.default_rng(int(4)))
 print(tester.choose_discard(given_cards, all_possible_constraints(), True))
