@@ -1,7 +1,15 @@
+from dataclasses import dataclass
 from tokenize import String
 import numpy as np
 from typing import Tuple, List
-import json
+from itertools import tee
+
+@dataclass(order=True)
+class Constraint:
+    ev: float
+    p: float
+    i: int
+    s: str
 
 class Player:
     def __init__(self, rng: np.random.Generator) -> None:
@@ -19,30 +27,26 @@ class Player:
         """
         self.rng = rng
 
-    def ev(self, constraints: list, hand: str):
-        value = dict()
-        # evaluating the expected payoff of each constraint
-        for constraint in constraints:
-            p = 1.0
-            for letter in hand:
-                idx = constraint.find(letter)
-                if idx!=-1:
-                    uselessletters.discard(letter)
-                    if (idx>0 and constraint[idx-1] not in hand)\
-                    and (idx<len(constraint)-1 and constraint[idx+1] not in hand):
-                        p *= 0.94
-            for idx in range(1,len(constraint)):
-                if (constraint[idx-1] not in hand) and (constraint[idx] not in hand):
-                    p *= 10/23
-                else:
-                    p *= 0.98
-            print(f"constraint: {constraint}")
-            print(f"p={p:.5f}")
-            value[constraint] = 2.0*p-1.0 if len(constraint)==2 else p-1+p*3.0*2**(len(constraint)-3)
-            print(f"ev={value[constraint]:.5f}")
+    def calc_ev(self, p, constraint):
+        n = len(constraint)
 
-        return value
-    
+        return 2.0*p-1.0 if len(constraint)==2 else p-1+p*3.0*2**(len(constraint)-3)
+
+    def approx_p(self, cards, constraint):
+        p = 1.0
+        n = len(constraint)
+
+        for i in range(1, n):
+            if i < n-1 and constraint[i] in cards:
+                if (constraint[i-1] not in cards) and (constraint[i+1] not in cards):
+                    p *= 0.94
+            if (constraint[i-1] not in cards) and (constraint[i] not in cards):
+                p *= 10/23
+            else:
+                p *= 0.98
+
+        return p
+
     #def choose_discard(self, cards: list[str], constraints: list[str]):
     def choose_discard(self, cards, constraints):
         """Function in which we choose which cards to discard, and it also inititalises the cards dealt to the player at the game beginning
@@ -54,16 +58,46 @@ class Player:
         Returns:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
-        constraints = [json.dumps(c) for c in constraints]
-        value = self.ev(constraints, cards)
-        sorted_constraints_dict = dict(sorted(value.items(), key=lambda item: item[1], reverse=True))
-        print("sorted constraints:", sorted_constraints_dict)
+        g = [[False for _ in range(24)] for _ in range(24)]
+        q, ret = [], []
 
-        discard_constraints = []
-        for constraint, ev in sorted_constraints_dict.items():
-            if ev <= 0:
-                discard_constraints.append(json.loads(constraint))
+        for i, c in enumerate(constraints):
+            s = c.replace('<', '')
+            p = self.approx_p(cards, c)
+            q.append(Constraint(self.calc_ev(p, s), p, i, s))
 
+        # itertools.pairwise() in python 3.10
+        def pairwise(iterable):
+            # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+            a, b = tee(iterable)
+            next(b, None)
+            return zip(a, b)
+
+        deps = set(cards)
+        while (q):
+            q = sorted(filter(lambda c: c.ev > 0, q)) 
+            c = q.pop()
+            ret.append(c.i)
+
+            for a, b in pairwise(c.s):
+                if not a in deps:
+                    deps.add(a)
+                if not b in deps:
+                    deps.add(b)
+                g[ord(a) - ord('A')][ord(b) - ord('A')] = True
+
+            # scale P(constraint) and recalc its ev
+            for constraint in q:
+                s = constraint.s
+                for a, b in pairwise(s):
+                    constraint.p *= 1 - 0.1 * sum(g[ord(a) - ord('A')])
+                    constraint.p *= 1 - 0.1 * sum(row[ord(b) - ord('A')] for row in g)
+
+                n = sum(e not in deps for e in s) // 2
+                constraint.p *= (8 - n) / (9 - n)
+                constraint.ev = self.calc_ev(constraint.p, s)
+
+        return ret
 
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
     def play(self, cards, constraints, state, territory):
