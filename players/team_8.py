@@ -130,7 +130,6 @@ class Player:
 
         Args:
             tree ("Tree"): the search tree
-            state (list[str]): the clock game state
             alpha (float): exploration parameter
         Returns:
             move: Node containing the new clock game state after best UCT move
@@ -140,8 +139,7 @@ class Player:
         move = None
 
         for child_node in tree.root.children:
-            node_UCT = (child_node.score/child_node.N + alpha *
-                        np.sqrt(tree.root.N/child_node.N))
+            node_UCT = (child_node.score/child_node.N + alpha * np.sqrt(tree.root.N/child_node.N))
             if node_UCT > max_UCT:
                 max_UCT = node_UCT
                 move = child_node
@@ -201,7 +199,6 @@ class Player:
         cur_node = tree.get(state)
         cur_node.score += score
         cur_node.N += 1
-        tree.root.score += score
         tree.root.N += 1
 
         return tree
@@ -218,7 +215,7 @@ class Player:
 
         for i in range(rollouts):
             available_letters = possible_letters.copy()
-            move = self.__select(tree, state)
+            move = self.__select(tree)
             available_letters.remove(move.letter)
             tree = self.__simulate(
                 tree, move.state, constraints, available_letters)
