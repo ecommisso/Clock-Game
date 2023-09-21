@@ -132,12 +132,12 @@ class Player:
         Args:
             tree ("Tree"): the search tree
             state (list[str]): the clock game state
-            alpha (float): exploration parameter [PERHAPS THIS CAN BE DETERMINED IN RISKY_VS_SAFE()?]
+            alpha (float): exploration parameter
         Returns:
-            state: the clock game state after best UCT move
+            move: Node containing the new clock game state after best UCT move
         """
 
-        max_UCT = 0.0
+        max_UCT = float('-inf')
         move = state
 
         for child_node in tree.root.children:
