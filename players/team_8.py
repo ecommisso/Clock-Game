@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from tokenize import String
+from typing import Tuple, List
+import argparse
 import numpy as np
 import numpy.typing as npt
 import random
 import string
-from typing import Tuple, List
-
 
 @dataclass
 class Node:
@@ -14,7 +14,6 @@ class Node:
     letter: str
     score: int = 0
     N: int = 0
-
 
 class Tree:
     def __init__(self, root: "Node"):
@@ -125,7 +124,7 @@ class Player:
                     score = score + score_value_list[len(list_of_letters) - 2]
         return score
 
-    def __select(self, tree: "Tree", state: list[str], alpha: float = 1):
+    def __select(self, tree: "Tree", alpha: float=1):
         """Starting from state, move to child node with the
         highest UCT value.
 
@@ -137,8 +136,8 @@ class Player:
             state: the clock game state after best UCT move
         """
 
-        max_UCT = 0.0
-        move = state
+        max_UCT = float('-inf')
+        move = None
 
         for child_node in tree.root.children:
             node_UCT = (child_node.score/child_node.N + alpha *
@@ -207,7 +206,7 @@ class Player:
 
         return tree
 
-    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int = 5000):
+    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int=2500):
         # MCTS main loop: Execute MCTS steps rollouts number of times
         # Then return successor with highest number of rollouts
         tree = Tree(Node(np.array(state), 24, 'Z', 0, 1))
