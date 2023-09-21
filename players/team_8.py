@@ -131,13 +131,13 @@ class Player:
         Args:
             tree ("Tree"): the search tree
             state (list[str]): the clock game state
-            alpha (float): exploration parameter [PERHAPS THIS CAN BE DETERMINED IN RISKY_VS_SAFE()?]
+            alpha (float): exploration parameter
         Returns:
-            state: the clock game state after best UCT move
+            move: Node containing the new clock game state after best UCT move
         """
 
         max_UCT = float('-inf')
-        move = None
+        move = state
 
         for child_node in tree.root.children:
             node_UCT = (child_node.score/child_node.N + alpha *
@@ -206,7 +206,7 @@ class Player:
 
         return tree
 
-    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int=2500):
+    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int = 5000):
         # MCTS main loop: Execute MCTS steps rollouts number of times
         # Then return successor with highest number of rollouts
         tree = Tree(Node(np.array(state), 24, 'Z', 0, 1))
