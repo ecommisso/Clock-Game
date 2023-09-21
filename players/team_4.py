@@ -102,7 +102,8 @@ class Player:
                                 constraint.p *= (10 - cnt) / (11 - cnt)
 
                 constraint.ev = self.calc_ev(constraint.p, s)
-                q = list(filter(lambda c: c.ev > 0, q))
+                
+            q = list(filter(lambda c: c.ev > 0, q))
 
         return ret
 
