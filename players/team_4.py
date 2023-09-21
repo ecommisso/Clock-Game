@@ -31,6 +31,7 @@ class Player:
         n = len(constraint)
 
         return 2.0*p-1.0 if len(constraint)==2 else p-1+p*3.0*2**(len(constraint)-3)
+
     def approx_p(self, cards, constraint):
         p = 1.0
         n = len(constraint)
@@ -63,7 +64,9 @@ class Player:
         for i, c in enumerate(constraints):
             s = c.replace('<', '')
             p = self.approx_p(cards, c)
-            q.append(Constraint(self.calc_ev(p, s), p, i, s))
+            ev = self.calc_ev(p, s)
+            if ev > 0:
+                q.append(Constraint(ev, p, i, s))
 
         # itertools.pairwise() in python 3.10
         def pairwise(iterable):
@@ -72,29 +75,34 @@ class Player:
             next(b, None)
             return zip(a, b)
 
-        deps = set(cards)
         while (q):
-            q = sorted(filter(lambda c: c.ev > 0, q)) 
+            q = sorted(q) 
             c = q.pop()
-            ret.append(c.i)
+            ret.append(constraints[c.i])
 
+            added = set()
             for a, b in pairwise(c.s):
-                if not a in deps:
-                    deps.add(a)
-                if not b in deps:
-                    deps.add(b)
-                g[ord(a) - ord('A')][ord(b) - ord('A')] = True
+                if not g[ord(a) - ord('A')][ord(b) - ord('A')]:
+                    g[ord(a) - ord('A')][ord(b) - ord('A')] = True
+                    added.add((a,b))
 
             # scale P(constraint) and recalc its ev
             for constraint in q:
                 s = constraint.s
-                for a, b in pairwise(s):
-                    constraint.p *= 1 - 0.1 * sum(g[ord(a) - ord('A')])
-                    constraint.p *= 1 - 0.1 * sum(row[ord(b) - ord('A')] for row in g)
+                for x, y in pairwise(s):
+                    if not g[ord(x) - ord('A')][ord(y) - ord('A')]:
+                        for a, b in added:
+                            if (x, y) == (a, b):
+                                continue
+                            if x == a:
+                                cnt = sum(g[ord(a) - ord('A')])
+                                constraint.p *= (10 - cnt) / (11 - cnt)
+                            if y == b:
+                                cnt = sum(row[ord(b) - ord('A')] for row in g)
+                                constraint.p *= (10 - cnt) / (11 - cnt)
 
-                n = sum(e not in deps for e in s) // 2
-                constraint.p *= (8 - n) / (9 - n)
                 constraint.ev = self.calc_ev(constraint.p, s)
+                q = list(filter(lambda c: c.ev > 0, q))
 
         return ret
 
