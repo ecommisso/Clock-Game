@@ -137,7 +137,7 @@ class Player:
         """
 
         max_UCT = float('-inf')
-        move = state
+        move = None
 
         for child_node in tree.root.children:
             node_UCT = (child_node.score/child_node.N + alpha *
