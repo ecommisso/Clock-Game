@@ -11,6 +11,69 @@ class Constraint:
     i: int
     s: str
 
+class Game:
+    def start(self, cards):
+        return "Z" * 24 + ({cards},) + (0,)
+
+    def next_state(self, state, play):
+        is_npc = state[-1]
+        state = list(state)
+        h, a = play
+        slot = (h%12)*2
+        state[slot if state[slot]=="Z" else slot+1] = a 
+        if not is_npc:
+            state[24].remove(a)
+        state[-1] = (state[-1] + 1) % 3
+
+        return tuple(state)
+
+    def legal_plays(self, state):
+        is_npc = state[-1]
+        np_cards = set(string.ascii_uppercase) - (set(state[:24]) | state[24] | {"Y"})
+        hrs_playable = {i%2 for i in range(24) if state[i] == "Z"}
+
+        plays = [
+            (h, a)
+            for h in hrs_playable
+            for a in np_cards if is_npc else cards
+        ]
+
+        return plays
+
+    def is_ended(self, state):
+
+        return "Z" not in set(state[:24])
+
+    def score(self, state, g, constraints):
+        pairs = {}
+        for i in range(24):
+            for j in range(24):
+                if g[i][j]:
+                    pairs.add((chr(ord("A") + i), chr(ord("A") + j)))
+
+        for i, a in enumerate(state[:24]):
+            for j in range(1, 11):
+                b = state[(i+j)%24]
+                if (a, b) in pairs:
+                    pairs.remove(a, b)
+
+        # itertools.pairwise() in python 3.10
+        def pairwise(iterable):
+            # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+            a, b = tee(iterable)
+            next(b, None)
+            return zip(a, b)
+
+        score = 0
+        for c in constraints:
+            if any(map(lambda p: p in pairs, pairwise(c.s))):
+                score -= 1
+            else:
+                n = len(c.s)
+                score += 1 if n == 2 else 3.0*2**(n-3)
+
+        return score
+
 class Player:
     def __init__(self, rng: np.random.Generator) -> None:
         """Initialise the player with given skill.
@@ -27,12 +90,12 @@ class Player:
         """
         self.rng = rng
 
-    def calc_ev(self, p, constraint):
+    def __calc_ev(self, p, constraint):
         n = len(constraint)
 
         return 2.0*p-1.0 if len(constraint)==2 else p-1+p*3.0*2**(len(constraint)-3)
 
-    def approx_p(self, cards, constraint):
+    def __approx_p(self, cards, constraint):
         p = 1.0
         n = len(constraint)
 
@@ -63,8 +126,8 @@ class Player:
 
         for i, c in enumerate(constraints):
             s = c.replace('<', '')
-            p = self.approx_p(cards, c)
-            ev = self.calc_ev(p, s)
+            p = self.__approx_p(cards, c)
+            ev = self.__calc_ev(p, s)
             if ev > 0:
                 q.append(Constraint(ev, p, i, s))
 
@@ -101,8 +164,9 @@ class Player:
                                 cnt = sum(row[ord(b) - ord('A')] for row in g)
                                 constraint.p *= (10 - cnt) / (11 - cnt)
 
-                constraint.ev = self.calc_ev(constraint.p, s)
-                q = list(filter(lambda c: c.ev > 0, q))
+                constraint.ev = self.__calc_ev(constraint.p, s)
+                
+            q = list(filter(lambda c: c.ev > 0, q))
 
         return ret
 
