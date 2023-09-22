@@ -3,6 +3,13 @@ from tokenize import String
 import numpy as np
 from typing import Tuple, List
 from itertools import tee
+from datetime import timedelta, datetime
+from random import choice
+from math import sqrt, log
+
+# Calc time limit per turn
+SECS = 1
+EXPLORE = sqrt(2)
 
 @dataclass(order=True)
 class Constraint:
@@ -90,6 +97,15 @@ class Player:
         """
         self.rng = rng
 
+        self.game = Game()
+        self.history = []
+        self.plays = {}
+        self.vals = {}
+
+        self.calc_time = timedelta(seconds=SECS)
+        self.C = EXPLORE
+        self.max_depth = 0
+
     def __calc_ev(self, p, constraint):
         n = len(constraint)
 
@@ -170,6 +186,53 @@ class Player:
 
         return ret
 
+    def __update(self, state):
+        self.history.append(state)
+
+    def __simulate(self):
+        plays, vals = self.plays, self.vals
+
+        states_copy = self.history[:]
+        state = states_copy[-1]
+
+        visited = set()
+        
+        expand = True
+        while not (self.game.is_ended(state)):
+            legal = self.game.legal_plays(state)
+            next_states = [(p, self.game.next_state(state, p)) for p in legal]
+
+            is_npc = state[-1]
+            if not is_npc and all(s in p for s in next_states):
+                log_sum = log(sum(plays[s] for p, s in next_states))
+                val, move, state = max(
+                    ((vals[s] / plays[s]) + 
+                     self.C * sqrt(log_sum / plays[s]), p, s)
+                    for p, s in next_states
+                )
+            else:
+                move, state = choice(next_states)
+
+            states_copy.append(state)
+
+            if expand and not is_npc and state not in self.plays:
+                expand = False
+                self.plays[state] = 0
+                self.vals[state] = 0
+            
+            visited.add(state)
+
+        score += self.game.score(state)
+
+        # backpropagate
+        for s in visited:
+            if s not in self.plays:
+                continue
+            plays[s] += 1
+            is_npc = state[-1]
+            if not is_npc:
+                vals[s] += score
+                
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
     def play(self, cards, constraints, state, territory):
         """Function which based n current game state returns the distance and angle, the shot must be played
@@ -186,9 +249,31 @@ class Player:
         """
         #Do we want intermediate scores also available? Confirm pls
 
-        letter = self.rng.choice(cards)
-        territory_array = np.array(territory)
-        available_hours = np.where(territory_array == 4)
-        hour = self.rng.choice(available_hours[0])          #because np.where returns a tuple containing the array, not the array itself
-        hour = hour%12 if hour%12!=0 else 12
-        return hour, letter
+        self.max_depth = 0
+        state = self.history[-1]
+        legal = self.game.legal_plays(state)
+
+        if not legal:
+            return 
+        if len(legal) == 1:
+            return legal[0]
+
+        games = 0
+        begin = datetime.datetime.utcnow()
+        while datetime.datetime.utcnow() - begin < self.calc_time:
+            self.__simulate
+            games += 1
+
+        next_states = [(p, self.game.next_state(state, p)) for p in legal]
+
+        print(f"Simulated {games} games")
+
+        ev, move = max(
+                (self.vals.get(state, 0) /
+                 self.plays.get(state, 1),
+                 p)
+                for p, s in next_states
+        )
+        print(f"Played {move}: {ev:.2f}")
+
+        return move
