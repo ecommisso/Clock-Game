@@ -206,6 +206,18 @@ class Player:
 
         return ret
 
+    def __prune(self, hand, states):
+        constraints = self.constraints
+        evs = []
+        for a in hand:
+            ev = sum(c.ev for c in constraints if a in c.s)
+            evs.append((ev, a))
+
+        discard = sorted(evs)[0][1]
+        pruned = [(p, s) for p, s in states if p[1] == discard]
+
+        return pruned
+
     def __simulate(self, state):
         visits, vals, C = self.visits, self.vals, self.C
         visited = set()
@@ -221,6 +233,11 @@ class Player:
             next_states = [(p, self.game.next_state(state, p)) for p in legal]
 
             is_npc = state[-1]
+            hand = state[24]
+            # prune tree if t < turn 3
+            if not is_npc and len(hand) > 6:
+                next_states = self.__prune(hand, next_states)
+
             if not is_npc and all((s in visits) for p, s in next_states):
                 logN = log(max(visits[state], 1))
 
