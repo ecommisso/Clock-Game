@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from tokenize import String
 import numpy as np
 from typing import Tuple, List
-from itertools import tee
+from itertools import tee, chain
 from datetime import timedelta, datetime
 from random import choice
 from math import sqrt, log
+import string
 
 # Constants
 CALC_SECS = 1
@@ -27,8 +28,8 @@ class Game:
         is_npc = state[-1]
         state = list(state)
         h, a = play
-        slot = (h%12)*2
-        state[slot if state[slot]=="Z" else slot+1] = a 
+        slot = (h%12)
+        state[slot if state[slot]=="Z" else slot+12] = a 
         if not is_npc:
             state[24] -= {a}
         state[-1] = (state[-1] + 1) % 3
@@ -37,13 +38,14 @@ class Game:
 
     def legal_plays(self, state):
         is_npc = state[-1]
-        np_cards = set(string.ascii_uppercase) - (set(state[:24]) | state[24] | {"Y"})
-        hrs_playable = {i%2 for i in range(24) if state[i] == "Z"}
+        hand = state[24]
+        np_cards = set(string.ascii_uppercase) - (set(state[:24]) | hand | {"Y"})
+        hrs_playable = {i%12 for i in range(24) if state[i] == "Z"}
 
         plays = [
             (h, a)
             for h in hrs_playable
-            for a in np_cards if is_npc else cards
+            for a in (np_cards if is_npc else hand)
         ]
 
         return plays
@@ -60,9 +62,7 @@ class Game:
                     pairs.add((chr(ord("A") + i), chr(ord("A") + j)))
 
         for i, a in enumerate(state[:24]):
-            if not i%2:
-                i += 1
-            for j in range(1, 11):
+            for j in chain(range(1, 5), range(13, 18)):
                 b = state[(i+j)%24]
                 pairs.discard((a, b))
 
@@ -75,7 +75,7 @@ class Game:
 
         score = 0
         for c in constraints:
-            if any(p in pairs for p in pairwise(c.s))):
+            if any(p in pairs for p in pairwise(c.s)):
                 score -= 1
             else:
                 n = c.size
@@ -107,7 +107,7 @@ class Player:
         self.C = EXPLORE
 
         self.graph = None
-        self.constraints = set()
+        self.constraints = []
 
     def __calc_ev(self, p, size):
 
@@ -157,14 +157,19 @@ class Player:
             next(b, None)
             return zip(a, b)
 
+        #deps = set(cards)
         while (q):
             q = sorted(q) 
             c = q.pop()
             ret.append(constraints[c.i])
-            self.constraints.add(c)
+            self.constraints.append(c)
 
             added = set()
             for a, b in pairwise(c.s):
+                #if not a in deps:
+                #    deps.add(a)
+                #if not b in deps:
+                #    deps.add(b)
                 if not g[ord(a) - ord('A')][ord(b) - ord('A')]:
                     g[ord(a) - ord('A')][ord(b) - ord('A')] = True
                     added.add((a,b))
@@ -184,7 +189,7 @@ class Player:
                                 cnt = sum(row[ord(b) - ord('A')] for row in g)
                                 constraint.p *= (10 - cnt) / (11 - cnt)
 
-                constraint.ev = self.__calc_ev(constraint.p, s)
+                constraint.ev = self.__calc_ev(constraint.p, constraint.size)
                 
             q = list(filter(lambda c: c.ev > 0, q))
 
@@ -193,27 +198,30 @@ class Player:
         return ret
 
     def __simulate(self, state):
-        visits, vals = self.visits, self.vals
+        visits, vals, C = self.visits, self.vals, self.C
         visited = set()
         
+        if state not in visits:
+            visits[state] = 0
+            vals[state] = 0
+
         expand = True
         while not (self.game.is_over(state)):
+            # select
             legal = self.game.legal_plays(state)
             next_states = [(p, self.game.next_state(state, p)) for p in legal]
 
-            # select
             is_npc = state[-1]
-            if not is_npc and all(s in p for s in next_states):
-                logN = log(sum(visits[s] for p, s in next_states))
+            if not is_npc and all((s in visits) for p, s in next_states):
+                logN = log(max(visits[state], 1))
+
                 _, move, state = max(
-                    ((vals[s] / visits[s]) + 
-                     self.C * sqrt(logN / visits[s]), p, s)
+                    ((vals[s] / visits[s]) +
+                     C * sqrt(logN / visits[s]), p, s)
                     for p, s in next_states
                 )
             else:
                 move, state = choice(next_states)
-
-            states_copy.append(state)
 
             # expand
             if expand and state not in self.visits:
@@ -221,13 +229,13 @@ class Player:
                 visits[state] = 0
                 vals[state] = 0
             
-            visited.add(state, constraints)
+            visited.add(state)
 
-        score += self.game.score(state, self.constraints)
+        score = self.game.score(state, self.graph, self.constraints)
 
         # backpropagate
         for s in visited:
-            if s not in self.visits:
+            if s not in visits:
                 continue
             visits[s] += 1
             vals[s] += score
@@ -262,8 +270,8 @@ class Player:
             return legal[0]
 
         games = 0
-        begin = datetime.datetime.utcnow()
-        while datetime.datetime.utcnow() - begin < self.calc_time:
+        begin = datetime.utcnow()
+        while datetime.utcnow() - begin < self.calc_time:
             self.__simulate(state)
             games += 1
 
@@ -271,14 +279,20 @@ class Player:
 
         print(f"Simulated {games} games")
 
-        mu_v, h, a =  max(
-            (self.vals.get(state, 0) /
-             self.visits.get(state, 1),
+        print(f"Next states:")
+        for p, s in next_states:
+            print(f"{p}, {s}, {self.visits.get(s)}")
+
+        
+        mu_v, p =  max(
+            (self.vals.get(s, 0) / self.visits.get(s, 1),
              p)
             for p, s in next_states
         )
-        print(f"Played {move}: {mu_v:.2f}")
 
+        print(f"Played {p}: {mu_v:.2f}")
+
+        h, a = p
         if not h:
             h = 12
 
