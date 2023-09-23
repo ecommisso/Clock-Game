@@ -157,7 +157,8 @@ class Player:
             next(b, None)
             return zip(a, b)
 
-        #deps = set(cards)
+        deps = set(cards)
+        d_flag = False
         while (q):
             q = sorted(q) 
             c = q.pop()
@@ -166,10 +167,12 @@ class Player:
 
             added = set()
             for a, b in pairwise(c.s):
-                #if not a in deps:
-                #    deps.add(a)
-                #if not b in deps:
-                #    deps.add(b)
+                if not a in deps:
+                    deps.add(a)
+                    d_flag = True
+                if not b in deps:
+                    deps.add(b)
+                    d_flag = True
                 if not g[ord(a) - ord('A')][ord(b) - ord('A')]:
                     g[ord(a) - ord('A')][ord(b) - ord('A')] = True
                     added.add((a,b))
@@ -188,9 +191,14 @@ class Player:
                             if y == b:
                                 cnt = sum(row[ord(b) - ord('A')] for row in g)
                                 constraint.p *= (10 - cnt) / (11 - cnt)
+                if d_flag:
+                    n = sum(e not in deps for e in s)
+                    d = len(deps)
+                    constraint.p *= (24 - d - n) / (25 - d - n)
 
                 constraint.ev = self.__calc_ev(constraint.p, constraint.size)
                 
+            d_flag = False
             q = list(filter(lambda c: c.ev > 0, q))
 
         self.graph = g
