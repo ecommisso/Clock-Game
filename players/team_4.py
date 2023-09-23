@@ -289,9 +289,10 @@ class Player:
 
         print(f"Simulated {games} games")
 
-        print(f"Next states:")
+        print(f"Current state: {state}")
+        print(f"Next moves:")
         for p, s in next_states:
-            print(f"{p}, {s}, {self.visits.get(s)}")
+            print(f"{p}: {self.visits.get(s)}, {self.vals.get(s, 0) / self.visits.get(s, 1):.2f}")
 
         
         mu_v, p =  max(
