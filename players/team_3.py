@@ -3,6 +3,15 @@ import numpy as np
 from typing import Tuple, List
 import time 
 
+##########################################################
+# Goals:   
+# 1.) Fix the the minimax: See the logic behind choosing each play for each corresponding letter.
+# 2.) Fix choosing constraints. After several runs, come up with an efficient method of choosing constraints.
+# 3.) Fix the lag that occurs during game play.
+# 4.) Attempt to setup the google cloud to implement several runs and store each score in an excel document.
+# 5.) A way to check that a move will satisfy a constraint right in the current play 
+##########################################################
+
 class Player:
     def __init__(self, rng: np.random.Generator) -> None:
         """Initialise the player with given skill.
@@ -125,15 +134,54 @@ class Player:
                 letters.remove(i)
         return letters 
 
+    # new minimax  
+    # def minimax(self, state, cards, constraints, depth, is_maximizing):
+    #     if depth == 8 or (time.process_time() - self.time) >= 1:
+    #         score = self.getScore(state, cards, constraints)
+    #         return None, score
 
+    #     available_hours = np.where(np.array(state) == 'Z')[0]
+    #     if is_maximizing:
+    #         best_score = float('-inf')
+    #         best_move = None
+
+    #         for hour in available_hours:
+    #             for card in cards:
+    #                 if card not in state:
+    #                     state[hour] = card, score = self.minimax(state, cards, constraints, depth + 1, False)
+    #                     state[hour] = 'Z'
+
+    #                     if score > best_score:
+    #                         best_score = score
+    #                         best_move = (hour, card)
+
+    #         return best_move, best_score
+    #     else:
+    #         best_score = float('inf')
+    #         best_move = None
+    #         other_cards = self.getOtherCards(cards, state)
+
+    #         for hour in available_hours:
+    #             for card in other_cards:
+    #                 if card not in state:
+    #                     state[hour] = card, score = self.minimax(state, cards, constraints, depth + 1, True)
+    #                     state[hour] = 'Z'
+
+    #                     if score < best_score:
+    #                         best_score = score
+    #                         best_move = (hour, card)
+
+    #         return best_move, best_score
+
+    # our original minimax 
     def minimax(self, state, cards, constraints, depth, isMaximizing):
-        bestMove = (0, 0)
+        bestMove = None
         score = self.getScore(state, cards, constraints)
         curr_time = time.process_time() - self.time
         # check what the score is/ who the "winner" is 
         if depth == 8 or curr_time >= 1:
             score = self.getScore(state, cards, constraints)
-            return bestMove, score
+            return state, score
 
         state_array = np.array(state)
         available_hours = np.where(state_array == 'Z')
@@ -161,6 +209,33 @@ class Player:
                             bestMove = [i, x]
                             return bestMove, score
 
+                '''
+                for child in availableMoves:
+                    for currLocation in availableMoves[child]:
+                        if not fallback_move:
+                            fallback_move = [child, currLocation]
+                        if self.is_move_valid(child, state, constraints, cards, currLocation):
+                            state[currLocation] = child
+                            territory[currLocation] = 1  # Current player
+
+                            other, util = self.minimize(cards, state, territory, constraints, alpha, beta)
+                            util += self.getCurrentScore(constraints, state, territory)
+
+                            if util > maxUtil:
+                                maxChild, maxUtil = [child, currLocation], util
+
+                            if maxUtil >= beta:
+                                return maxChild, maxUtil
+
+                            alpha = max(alpha, maxUtil)
+
+                if not maxChild and fallback_move:
+                    # Fallback to a random move if no valid moves are found
+                    maxChild = fallback_move
+
+                return maxChild, maxUtil
+                '''
+
         #minimizing 
         #figure out how to minimize twice to represent the two players
         #add alpha beta
@@ -175,10 +250,15 @@ class Player:
                         state[i] = 'Z'
                         if (score<bestScore):
                             bestScore = score
-                            bestMove = [i,x]
-                    
-        
-        return bestMove, score
+                            bestMove = [i, x]
+
+        if bestMove is None:
+            letter = self.rng.choice(cards)
+            hour = self.rng.choice(avail_arr[0])          #because np.where returns a tuple containing the array, not the array itself
+            hour = hour%12 if hour%12!=0 else 12
+            bestMove =  hour, letter
+                            
+        return bestMove, bestScore
         
 
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
@@ -207,9 +287,11 @@ class Player:
         
         bestMove = self.minimax(new_state, new_cards, new_constraints, depth, True)[0]
         #print("check: ", bestMove)
-        letter= bestMove[1]
+        letter = bestMove[1]
         hour = bestMove[0]
         hour = hour%12 if hour%12!=0 else 12
+        print("MOVE = ", hour, ", ", letter)
+        # print("State", state)
         return hour, letter
     
     # func to get the score of our own cards at the passed in state 
@@ -224,16 +306,17 @@ class Player:
          
         for i in range(len(constraints) - 1):
             constraint = constraints[i].split('<')
-            if constraint[i] in positions and constraint[i+1] in positions:
-                position1 = positions[constraint[i]]
-                position2 = positions[constraint[i+1]]
-                difference = (position2%12) - (position1%12)
-                if difference < 0:
-                    difference += 12 
-                if difference <= 5:
-                    totalScore += float(score_arr[(len(constraint))]/len(constraint))
-                else: 
-                    totalScore -= 0.5
+            for j in range(len(constraint) - 1):
+                if constraint[j] in positions and constraint[j+1] in positions:
+                    position1 = positions[constraint[j]]
+                    position2 = positions[constraint[j+1]]
+                    difference = (position2%12) - (position1%12)
+                    if difference < 0:
+                        difference += 12 
+                    if difference <= 5:
+                        totalScore += float(score_arr[(len(constraint))]/len(constraint))
+                    else: 
+                        totalScore -= 3
         
         #print("SCORE: ", totalScore)
         return totalScore    
