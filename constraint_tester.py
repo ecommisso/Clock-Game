@@ -2,12 +2,12 @@ from players.team_8 import *
 from itertools import permutations
 
 
-given_cards = ["A", "B", "C"]
+given_cards = ["A", "B", "G", "H"]
 
 
 def all_possible_constraints():
     # Generate combinations of 1 to 5 letters (as each letter appears only once)
-    letters = ['A', 'B', 'C', 'D', 'E']
+    letters = ['A', 'B', 'C', 'D']
     all_permutations = []
 
     # Generate permutations of 2 to 5 letters (as each letter appears only once)
