@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import math
 from tokenize import String
 from typing import Tuple, List
 import argparse
@@ -6,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import random
 import string
+import heapq
 
 
 @dataclass
@@ -55,50 +57,67 @@ class Player:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
         final_constraints = []
+        constraint_heap = []
+        score_threshold = 1.3
 
         for constraint in constraints:
-            present_pct, alternating_pct, doubles_pct = 0, 0, 1
+            precense_sbscore, alternating_sbscore, doubles_sbscore = 0, 0, 1
             lst = constraint.split("<")
             letters_in_constraint = set(lst)
 
             num_letters_in_cards = sum(
                 1 for letter in letters_in_constraint if letter in cards)
-            present_pct = (num_letters_in_cards / len(letters_in_constraint))
+            precense_sbscore = (num_letters_in_cards /
+                                len(letters_in_constraint))
 
             if all(lst[i] in cards for i in range(0, len(lst), 2)) and len(letters_in_constraint) > 2:
                 # [0, 2] in 3; [0, 2] in 4; [0, 2, 4] in 5
-                alternating_pct = 0.6
+                alternating_sbscore = 0.6
             if all(lst[i] in cards for i in range(1, len(lst), 2)):
                 if len(letters_in_constraint) > 2 and len(letters_in_constraint) % 2 == 1:
                     # [1] in 3; [1, 3] in 5
-                    alternating_pct += 0.4
+                    alternating_sbscore += 0.4
                 elif len(letters_in_constraint) > 2:
                     # [1, 3] in 4
-                    if alternating_pct == 0:
-                        alternating_pct += 0.6
+                    if alternating_sbscore == 0:
+                        alternating_sbscore += 0.6
                     else:
                         # in case this is a 4/4
-                        alternating_pct += 0.4
+                        alternating_sbscore += 0.4
 
             i = 1
             while i < len(lst):
                 if lst[i] not in cards and lst[i - 1] not in cards:
-                    doubles_pct = 0
+                    doubles_sbscore = 0
                 i += 1
 
-            pct = ((present_pct * present_pct) * len(constraint)
-                   * 0.4) + alternating_pct * 0.3 + doubles_pct * 0.3
-            if pct >= 1.3:
-                final_constraints.append(constraint)
+            const_score = ((precense_sbscore * precense_sbscore) * len(constraint)
+                           * 0.4) + alternating_sbscore * 0.3 + doubles_sbscore * 0.3
+
+            heapq.heappush(constraint_heap, (const_score * -1,
+                           len(lst) * -1, constraint))  # heap prioritizes by score, then by length, then by alphabetization of constraints
 
             if data_mode:
                 with open("data.txt", "a") as file1:
-                    # Writing data to a file
-                    file1.write("\n" + constraint + " present: " + str(present_pct) +
-                                " alt: " + str(alternating_pct) + " final pct: " + str(pct))
+
+                    if const_score >= score_threshold:
+                        line = "{:<{width}} presence: {:.3f}\talt: {:.3f}\tdbls: {:d}\t...final pct: {:.3f} !".format(
+                            constraint, precense_sbscore, alternating_sbscore, doubles_sbscore, const_score, width=10)
+                    else:
+                        line = "{:<{width}} presence: {:.3f}\talt: {:.3f}\tdbls: {:d}\t...final pct: {:.3f}".format(
+                            constraint, precense_sbscore, alternating_sbscore, doubles_sbscore, const_score, width=10)
+                    file1.write("\n" + line)
+
                     file1.flush()
 
-            # print(constraint, "present:", present_pct, "alt:", alternating_pct, "final pct:", pct, "\n")
+        for _ in range(int(math.sqrt(float(len(constraints))) * 2)):
+            if len(constraint_heap) != 0:
+                const = heapq.heappop(constraint_heap)
+                if const[0] <= -score_threshold:  # adding an additional threshold
+                    final_constraints.append(const[2])
+                # will pick the constraint no matter what the score is if we are in a one-constraint game
+                elif len(constraints) == 1:
+                    final_constraints.append(const[2])
         return final_constraints
 
     def __risky_versus_safe():
