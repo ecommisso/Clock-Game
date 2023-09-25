@@ -1,10 +1,13 @@
 from dataclasses import dataclass
+import math
 from tokenize import String
+from typing import Tuple, List
+import argparse
 import numpy as np
 import numpy.typing as npt
 import random
 import string
-from typing import Tuple, List
+import heapq
 
 
 @dataclass
@@ -54,43 +57,67 @@ class Player:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
         final_constraints = []
+        constraint_heap = []
+        score_threshold = 1.3
 
         for constraint in constraints:
-            present_pct, alternating_pct = 0, 0
+            precense_sbscore, alternating_sbscore, doubles_sbscore = 0, 0, 1
             lst = constraint.split("<")
             letters_in_constraint = set(lst)
 
             num_letters_in_cards = sum(
                 1 for letter in letters_in_constraint if letter in cards)
-            present_pct = (num_letters_in_cards / len(letters_in_constraint))
+            precense_sbscore = (num_letters_in_cards /
+                                len(letters_in_constraint))
 
             if all(lst[i] in cards for i in range(0, len(lst), 2)) and len(letters_in_constraint) > 2:
                 # [0, 2] in 3; [0, 2] in 4; [0, 2, 4] in 5
-                alternating_pct = 0.6
+                alternating_sbscore = 0.6
             if all(lst[i] in cards for i in range(1, len(lst), 2)):
                 if len(letters_in_constraint) > 2 and len(letters_in_constraint) % 2 == 1:
                     # [1] in 3; [1, 3] in 5
-                    alternating_pct += 0.4
+                    alternating_sbscore += 0.4
                 elif len(letters_in_constraint) > 2:
                     # [1, 3] in 4
-                    if alternating_pct == 0:
-                        alternating_pct += 0.6
+                    if alternating_sbscore == 0:
+                        alternating_sbscore += 0.6
                     else:
                         # in case this is a 4/4
-                        alternating_pct += 0.4
+                        alternating_sbscore += 0.4
 
-            pct = present_pct * 0.5 + alternating_pct * 0.5
-            if pct >= 0.4:
-                final_constraints.append(constraint)
+            i = 1
+            while i < len(lst):
+                if lst[i] not in cards and lst[i - 1] not in cards:
+                    doubles_sbscore = 0
+                i += 1
+
+            const_score = ((precense_sbscore * precense_sbscore) * len(constraint)
+                           * 0.4) + alternating_sbscore * 0.3 + doubles_sbscore * 0.3
+
+            heapq.heappush(constraint_heap, (const_score * -1,
+                           len(lst) * -1, constraint))  # heap prioritizes by score, then by length, then by counter (do not want to rely on alphabetization of constraints as a tie-breaker)
 
             if data_mode:
                 with open("data.txt", "a") as file1:
-                    # Writing data to a file
-                    file1.write("\n" + constraint + " present: " + str(present_pct) +
-                                " alt: " + str(alternating_pct) + " final pct: " + str(pct))
+
+                    if const_score >= score_threshold:
+                        line = "{:<{width}} presence: {:.3f}\talt: {:.3f}\tdbls: {:d}\t...final pct: {:.3f} !".format(
+                            constraint, precense_sbscore, alternating_sbscore, doubles_sbscore, const_score, width=10)
+                    else:
+                        line = "{:<{width}} presence: {:.3f}\talt: {:.3f}\tdbls: {:d}\t...final pct: {:.3f}".format(
+                            constraint, precense_sbscore, alternating_sbscore, doubles_sbscore, const_score, width=10)
+                    file1.write("\n" + line)
+
                     file1.flush()
 
-            # print(constraint, "present:", present_pct, "alt:", alternating_pct, "final pct:", pct, "\n")
+        for _ in range(int(math.sqrt(float(len(constraints))) * 2)):
+            if len(constraint_heap) != 0:
+                const = heapq.heappop(constraint_heap)
+                if const[0] <= -score_threshold:  # adding an additional threshold
+                    final_constraints.append(const[2])
+                # will pick the constraint no matter what the score is if we are in a one-constraint game
+                elif len(constraints) == 1:
+                    final_constraints.append(const[2])
         return final_constraints
 
     def __risky_versus_safe():
@@ -125,20 +152,19 @@ class Player:
                     score = score + score_value_list[len(list_of_letters) - 2]
         return score
 
-    def __select(self, tree: "Tree", state: list[str], alpha: float = 1):
+    def __select(self, tree: "Tree", alpha: float = 2.5):
         """Starting from state, move to child node with the
         highest UCT value.
 
         Args:
             tree ("Tree"): the search tree
-            state (list[str]): the clock game state
-            alpha (float): exploration parameter [PERHAPS THIS CAN BE DETERMINED IN RISKY_VS_SAFE()?]
+            alpha (float): exploration parameter
         Returns:
-            state: the clock game state after best UCT move
+            move: Node containing the new clock game state after best UCT move
         """
 
-        max_UCT = 0.0
-        move = state
+        max_UCT = float('-inf')
+        move = None
 
         for child_node in tree.root.children:
             node_UCT = (child_node.score/child_node.N + alpha *
@@ -202,12 +228,11 @@ class Player:
         cur_node = tree.get(state)
         cur_node.score += score
         cur_node.N += 1
-        tree.root.score += score
         tree.root.N += 1
 
         return tree
 
-    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int = 1000):
+    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int = 2500):
         # MCTS main loop: Execute MCTS steps rollouts number of times
         # Then return successor with highest number of rollouts
         tree = Tree(Node(np.array(state), 24, 'Z', 0, 1))
@@ -219,7 +244,7 @@ class Player:
 
         for i in range(rollouts):
             available_letters = possible_letters.copy()
-            move = self.__select(tree, state)
+            move = self.__select(tree)
             available_letters.remove(move.letter)
             tree = self.__simulate(
                 tree, move.state, constraints, available_letters)
