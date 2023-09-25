@@ -1,21 +1,31 @@
 The game.....has started.
-Move 1 : player 1 ,time 0.0002601146697998047s, C at 8
-Move 2 : player 2 ,time 0.00018095970153808594s, B at 8
-Move 3 : player 3 ,time 1.1544771194458008s, N at 12
-Move 1 : player 1 ,time 0.00012969970703125s, S at 3
-Move 2 : player 2 ,time 0.0002570152282714844s, H at 1
-Move 3 : player 3 ,time 1.0282230377197266s, Q at 2
-Move 1 : player 1 ,time 0.0001308917999267578s, A at 9
-Move 2 : player 2 ,time 0.0002598762512207031s, I at 2
-Move 3 : player 3 ,time 1.0458958148956299s, D at 4
-Move 1 : player 1 ,time 0.0001227855682373047s, O at 4
-Move 2 : player 2 ,time 0.00023031234741210938s, U at 6
-Move 3 : player 3 ,time 1.0180869102478027s, T at 5
-Move 1 : player 1 ,time 0.00013709068298339844s, V at 10
-Move 2 : player 2 ,time 0.00026607513427734375s, R at 1
-Move 3 : player 3 ,time 1.018357276916504s, X at 7
-Move 1 : player 1 ,time 0.00013899803161621094s, M at 6
-Move 2 : player 2 ,time 0.0002510547637939453s, L at 11
-Move 3 : player 3 ,time 1.0078551769256592s, G at 12
-Move 1 : player 1 ,time 0.00011801719665527344s, K at 10
-Move 2 : player 2 ,time 0.00025582313537597656s, W at 9
+Move 1 : player 1 ,time 0.0003712177276611328s, E at 11
+Move 2 : player 2 ,time 0.00016117095947265625s, I at 1
+Move 3 : player 3 ,time 1.2403459548950195s, N at 12
+Move 1 : player 1 ,time 0.0070002079010009766s, M at 7
+Move 2 : player 2 ,time 0.00016808509826660156s, R at 10
+Move 3 : player 3 ,time 1.270561933517456s, J at 8
+Move 1 : player 1 ,time 0.00018286705017089844s, A at 6
+Move 2 : player 2 ,time 0.0002009868621826172s, U at 2
+Move 3 : player 3 ,time 1.0610411167144775s, Q at 3
+Move 1 : player 1 ,time 0.00012922286987304688s, K at 1
+Move 2 : player 2 ,time 0.0002758502960205078s, B at 7
+Move 3 : player 3 ,time 1.0245428085327148s, D at 4
+Move 1 : player 1 ,time 0.0001342296600341797s, S at 11
+Move 2 : player 2 ,time 0.0001900196075439453s, P at 5
+Move 3 : player 3 ,time 1.016557216644287s, T at 9
+Move 1 : player 1 ,time 0.00011277198791503906s, O at 2
+Move 2 : player 2 ,time 0.00024580955505371094s, L at 10
+Move 3 : player 3 ,time 1.0070910453796387s, X at 12
+Move 1 : player 1 ,time 0.00011372566223144531s, V at 5
+Move 2 : player 2 ,time 0.0002429485321044922s, H at 3
+Move 3 : player 3 ,time 0.10244870185852051s, F at 9
+Move 1 : player 1 ,time 9.703636169433594e-05s, C at 6
+Move 2 : player 2 ,time 0.00021600723266601562s, W at 4
+Move 3 : player 3 ,time 0.0005617141723632812s, G at 8
+Player 1 has score 0 with satistied constraints ['B<E', 'H<M'] unsatisfied constraints ['U<X<L<T', 'W<O<A<M<Q'] and initial constraints ['B<E', 'U<O<C', 'U<X<L<T', 'W<O<A<M<Q', 'H<M']
+Player 2 has score 0 with satistied constraints ['E<Q'] unsatisfied constraints ['R<S<K<I'] and initial constraints ['W<F', 'H<A<W', 'R<S<K<I', 'U<E<N<H<G', 'E<Q']
+Player 3 has score 2 with satistied constraints ['D<T', 'J<N'] unsatisfied constraints [] and initial constraints ['D<T', 'R<A<I', 'U<D<X<P', 'C<Q<R<I<D', 'J<N']
+Congratulations Player 3 you are the winner!!!
+Time taken by player 1, 2 and 3 to choose : [9.107589721679688e-05, 3.910064697265625e-05, 5.91278076171875e-05]
+Total time taken by player 1, 2 and 3 to decide moves : [0.008141279220581055, 0.0017008781433105469, 6.7231504917144775]
