@@ -8,6 +8,7 @@ import numpy.typing as npt
 import random
 import string
 import heapq
+import itertools
 
 
 @dataclass
@@ -59,6 +60,7 @@ class Player:
         final_constraints = []
         constraint_heap = []
         score_threshold = 1.3
+        counter = itertools.count()
 
         for constraint in constraints:
             precense_sbscore, alternating_sbscore, doubles_sbscore = 0, 0, 1
@@ -95,7 +97,7 @@ class Player:
                            * 0.4) + alternating_sbscore * 0.3 + doubles_sbscore * 0.3
 
             heapq.heappush(constraint_heap, (const_score * -1,
-                           len(lst) * -1, constraint))  # heap prioritizes by score, then by length, then by alphabetization of constraints
+                           len(lst) * -1, next(counter), constraint))  # heap prioritizes by score, then by length, then by alphabetization of constraints
 
             if data_mode:
                 with open("data.txt", "a") as file1:
@@ -114,10 +116,10 @@ class Player:
             if len(constraint_heap) != 0:
                 const = heapq.heappop(constraint_heap)
                 if const[0] <= -score_threshold:  # adding an additional threshold
-                    final_constraints.append(const[2])
+                    final_constraints.append(const[3])
                 # will pick the constraint no matter what the score is if we are in a one-constraint game
                 elif len(constraints) == 1:
-                    final_constraints.append(const[2])
+                    final_constraints.append(const[3])
         return final_constraints
 
     def __risky_versus_safe():
