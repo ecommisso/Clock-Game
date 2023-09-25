@@ -83,7 +83,7 @@ class Player:
 
             pct = ((present_pct * present_pct) * len(constraint)
                    * 0.5) + alternating_pct * 0.5
-            if pct >= 0.4:
+            if pct >= 1.3:
                 final_constraints.append(constraint)
 
             if data_mode:
