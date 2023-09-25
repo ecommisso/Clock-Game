@@ -11,6 +11,7 @@ import string
 # Constants
 CALC_SECS = 1
 EXPLORE = sqrt(2)
+PENALTY = 10
 
 @dataclass(order=True)
 class Constraint:
@@ -76,7 +77,7 @@ class Game:
         score = 0
         for c in constraints:
             if any(p in pairs for p in pairwise(c.s)):
-                score -= 1
+                score -= PENALTY
             else:
                 n = c.size
                 score += 1 if n == 2 else 3.0*2**(n-3)
