@@ -99,10 +99,6 @@ class Player:
 
             if data_mode:
                 with open("data.txt", "a") as file1:
-                    # file1.write("\n" + constraint + " present: " + str(precense_sbscore) +
-                    #             "\talt: " + str(alternating_sbscore) +
-                    #             "\tdoubles: " + str(doubles_sbscore) +
-                    #             "\t...final pct: " + str(const_score))
 
                     if const_score >= score_threshold:
                         line = "{:<{width}} presence: {:.3f}\talt: {:.3f}\tdbls: {:d}\t...final pct: {:.3f} !".format(
