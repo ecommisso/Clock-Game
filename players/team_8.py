@@ -95,7 +95,7 @@ class Player:
                            * 0.4) + alternating_sbscore * 0.3 + doubles_sbscore * 0.3
 
             heapq.heappush(constraint_heap, (const_score * -1,
-                           len(lst) * -1, constraint))  # heap prioritizes by score, then by length, then by alphabetization of constraints
+                           len(lst) * -1, constraint))  # heap prioritizes by score, then by length, then by counter (do not want to rely on alphabetization of constraints as a tie-breaker)
 
             if data_mode:
                 with open("data.txt", "a") as file1:
