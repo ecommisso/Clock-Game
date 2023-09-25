@@ -46,7 +46,6 @@ class Player:
 
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
     def play(self, cards, constraints, state, territory):
-        print("\ncards: ", cards)
         """Function which based n current game state returns the distance and angle, the shot must be played
 
         Args:
@@ -67,43 +66,35 @@ class Player:
         for constraint in constraints: 
             #if we have all letters then play this constraint
             if self.__haveAllLetters(cards, constraint): 
-                print("have all letters in ", constraint)
                 letter = constraint[0]
-                print("setting letter to ", letter)
                 self.queue.append(constraint[2])
                 break
             elif len(constraint) == 3: 
                 #2 letter constraint where we have 1 letter, check that other letter was played 
                 playedAt = self.__wasPlayedAt(constraint[2], state)
                 if constraint[0] in cards and playedAt is not None: 
-                    print("playing ", constraint[0])
                     letter = constraint[0]
                     if letter in self.queue: self.queue.remove(letter)
                     hour = self.__chooseHour(playedAt, state, False)
                     break
                 playedAt = self.__wasPlayedAt(constraint[0], state)
                 if constraint[2] in cards and playedAt is not None: 
-                    print("playing ", constraint[2])
                     letter = constraint[2]
                     if letter in self.queue: self.queue.remove(letter)
                     hour = self.__chooseHour(playedAt, state, True)
                     break
         #play next in queue if not empty
         if letter is None and self.queue != []: 
-            print("letter is none and queue is not empty")
-            print("queue: ", self.queue)
             letter = self.queue.pop()
         #play from discard if not empty 
         elif letter is None: 
             if self.discardPile != []:
-                print("letter is none and discard pile is not empty")
                 letter = self.rng.choice(self.discardPile)
                 self.discardPile.remove(letter)
             else: letter = self.rng.choice(cards)
         
         #territory_array = np.array(territory)
         #available_hours = np.where(territory_array == 4)
-        print("these are the available hours:", available_hours)
         if hour is None:   
             hour = self.rng.choice(available_hours[0])
             hour = hour%12 if hour%12!=0 else 12
@@ -145,11 +136,8 @@ class Player:
     
     #check if letter was played
     def __wasPlayedAt(self, letter, state): 
-        print("state: ", state)
         for hour, letterAtHour in enumerate(state): 
             if letter == letterAtHour: 
-                print("the hour is:", hour)
-                print("letter ", letter, " found at ", hour)
                 return hour
         return None 
     
@@ -161,7 +149,6 @@ class Player:
             i = 1
             while i < 6: 
                 hour = (hourPlayed+i)%24
-                print("hour in if: ", hour)
                 if state[hour] == 'Z': return hour
                 complimentary = self.__getComplimentary(hour)
                 if state[complimentary] == 'Z': return complimentary
@@ -170,7 +157,6 @@ class Player:
             i = 1 
             while i < 6: 
                 hour = (hourPlayed-i)%24
-                print("hour: ", hour)
                 if state[hour] == 'Z': return hour 
                 complimentary = self.__getComplimentary(hour)
                 if state[complimentary] == 'Z': return complimentary
