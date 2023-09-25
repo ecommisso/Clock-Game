@@ -7,6 +7,7 @@ import numpy.typing as npt
 import random
 import string
 
+
 @dataclass
 class Node:
     state: npt.ArrayLike
@@ -14,6 +15,7 @@ class Node:
     letter: str
     score: int = 0
     N: int = 0
+
 
 class Tree:
     def __init__(self, root: "Node"):
@@ -55,7 +57,7 @@ class Player:
         final_constraints = []
 
         for constraint in constraints:
-            present_pct, alternating_pct = 0, 0
+            present_pct, alternating_pct, doubles_pct = 0, 0, 1
             lst = constraint.split("<")
             letters_in_constraint = set(lst)
 
@@ -78,10 +80,14 @@ class Player:
                         # in case this is a 4/4
                         alternating_pct += 0.4
 
-            # pct = present_pct * 0.5 + alternating_pct * 0.5
+            i = 1
+            while i < len(lst):
+                if lst[i] not in cards and lst[i - 1] not in cards:
+                    doubles_pct = 0
+                i += 1
 
             pct = ((present_pct * present_pct) * len(constraint)
-                   * 0.5) + alternating_pct * 0.5
+                   * 0.4) + alternating_pct * 0.3 + doubles_pct * 0.3
             if pct >= 1.3:
                 final_constraints.append(constraint)
 
@@ -127,7 +133,7 @@ class Player:
                     score = score + score_value_list[len(list_of_letters) - 2]
         return score
 
-    def __select(self, tree: "Tree", alpha: float=1):
+    def __select(self, tree: "Tree", alpha: float = 1):
         """Starting from state, move to child node with the
         highest UCT value.
 
@@ -142,7 +148,8 @@ class Player:
         move = None
 
         for child_node in tree.root.children:
-            node_UCT = (child_node.score/child_node.N + alpha * np.sqrt(tree.root.N/child_node.N))
+            node_UCT = (child_node.score/child_node.N + alpha *
+                        np.sqrt(tree.root.N/child_node.N))
             if node_UCT > max_UCT:
                 max_UCT = node_UCT
                 move = child_node
