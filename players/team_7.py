@@ -4,6 +4,7 @@ from typing import Tuple, List
 import random
 import time
 import string
+import queue as Q
 
 letters = list(string.ascii_uppercase)
 
@@ -33,34 +34,90 @@ class Player:
         Returns:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
-        final_constraints = []
-        constraint_list = [[], [], [], []]
-        # TODO: Can we always assume we will get valid input?
+        all_constraints = []
+        constraint_list = [Q.PriorityQueue(), Q.PriorityQueue(), Q.PriorityQueue(), Q.PriorityQueue()]
         for i in range(len(constraints)):
             letter_list = constraints[i]
-            letters = letter_list.split('<')
-            length_of_letters = len(letters)
-            missing_letters = len([letter for letter in letters if letter not in cards])
-            # always add constaints of size 2 and 3 if you have at least one letter
-            if length_of_letters == 2 and missing_letters <= 1:
-                constraint_list[length_of_letters - 2].append(letter_list)
-            elif length_of_letters == 3 and missing_letters <= 2:
-                if (letters[0] in cards and letters[2] in cards) or (letters[1] in cards):
-                    constraint_list[length_of_letters - 2].append(letter_list)
-            elif length_of_letters == 4 and missing_letters <= 2:
-                if (letters[0] in cards and letters[2] in cards) or (letters[1] in cards and letters[3] in cards):
-                    constraint_list[length_of_letters - 2].append(letter_list)
-            elif length_of_letters == 5 and missing_letters <= 2:
-                if (letters[0] in cards and letters[2] in cards) or (letters[1] in cards and letters[3] in cards):
-                    constraint_list[length_of_letters - 2].append(letter_list)
+            all_letters = letter_list.split('<')
+            length_of_letters = len(all_letters)
+            missing_letters = len([letter for letter in all_letters if letter not in cards])
+            # add constraints into priority queue based on expected value ranking
+            if length_of_letters == 2:
+                if missing_letters == 0:
+                    constraint_list[length_of_letters - 2].put((10, letter_list))
+                    all_constraints.append(letter_list)
+                elif missing_letters == 1:
+                    constraint_list[length_of_letters - 2].put((11, letter_list))
+                    all_constraints.append(letter_list)
+            elif length_of_letters == 3:
+                if missing_letters == 2 and all_letters[1] in cards:
+                    constraint_list[length_of_letters - 2].put((9, letter_list))
+                    all_constraints.append(letter_list)
+                elif missing_letters == 1:
+                    constraint_list[length_of_letters - 2].put((8, letter_list))
+                    all_constraints.append(letter_list)
+                elif missing_letters == 0:
+                    constraint_list[length_of_letters - 2].put((7, letter_list))
+                    all_constraints.append(letter_list)
+            elif length_of_letters == 4:
+                if missing_letters == 2:
+                    constraint_list[length_of_letters - 2].put((6, letter_list))
+                    all_constraints.append(letter_list)
+                elif missing_letters == 1:
+                    constraint_list[length_of_letters - 2].put((5, letter_list))
+                    all_constraints.append(letter_list)
+                elif missing_letters == 0:
+                    constraint_list[length_of_letters - 2].put((3, letter_list))
+                    all_constraints.append(letter_list)
+            elif length_of_letters == 5:
+                if missing_letters == 2:
+                    constraint_list[length_of_letters - 2].put((4, letter_list))
+                    all_constraints.append(letter_list)
+                elif missing_letters == 1:
+                    constraint_list[length_of_letters - 2].put((2, letter_list))
+                    all_constraints.append(letter_list)
+                elif missing_letters == 0:
+                    constraint_list[length_of_letters - 2].put((1, letter_list))
+                    all_constraints.append(letter_list)
 
-        # TODO: Check for contradictory constraints
-
-        # print(constraints)
+        final_tuples = []
+        # Pick constraints - currently takes top 3 constraints of each constraint size
         for i in range(len(constraint_list)):
-             final_constraints.extend(constraint_list[i])
-
+            # TODO: replace any dropped constraints from contradictions...
+            # TODO: mess around with optimal number of constraints to keep per length, so not set to 1 for each
+            for j in range(1):
+                if not constraint_list[i].empty():
+                    # count any singular contradiction as a contradiction
+                    # TODO: Think of better way to handle contradictions based on groupings when C get large...
+                    constraint_tuple = constraint_list[i].get()
+                    if not self.check_contradiction(constraint_tuple, final_tuples):
+                        final_tuples.append(constraint_tuple)
+                else:
+                    break
+        final_constraints = [x[1] for x in final_tuples]
         return final_constraints
+
+    # returns true if contradiction was found
+    def check_contradiction(self, con_tuple, final_tuples):
+        num_contradiction = 0
+        for i in range(0, len(con_tuple[1]) - 2, 2):
+            contradiction_substring = con_tuple[1][i:i + 3][::-1]
+            old_con_list_size = len(final_tuples)
+            # remove tuples with overlapping substring when new tuple has lower expected value ranking
+            for j in range(old_con_list_size):
+                if contradiction_substring in final_tuples[j][1]:
+                    num_contradiction += 1
+
+            # Skip the current constraint if multiple contradictions are found against it
+            if num_contradiction > 1:
+                return True
+
+            final_tuples[:] = [x for x in final_tuples if not (contradiction_substring in x[1] and con_tuple[0] < x[0])]
+            # if element contradiction present and removed, return false so that the new tuple gets added
+            if num_contradiction == 1:
+                return old_con_list_size == len(final_tuples)
+
+        return False
 
     def play(self, cards, constraints, state, territory):
         """Determines the next move based on the current game state.
@@ -81,18 +138,12 @@ class Player:
 
         state_array = np.array(state).tolist()
         duplicate_territory = territory.copy()
-        duplicate_constraints = constraints.copy()
 
-        if len(constraints) == 1 and len(constraints[0].split("<")) == 2:
-            if not self.check_two_letter_constraint_viability(constraints[0], state_array, duplicate_territory):
-                available_moves = self.getAvailableMoves(cards, duplicate_territory)
-                random_move = random.choice(list(available_moves.items()))
-                random_letter = random_move[0]
-                random_hour = random.choice(random_move[1]) % 12
-                random_hour = random_hour if random_hour != 0 else 12
-                return random_hour, random_letter
+        # Filter out infeasible constraints
+        feasible_constraints = [c for c in constraints if self.is_constraint_feasible(c, state, cards)]
 
-        child, util = self.maximize(cards, state_array, duplicate_territory, duplicate_constraints, -10000, 10000)
+        # Use the maximize function directly
+        child, util = self.maximize(cards, state_array, duplicate_territory, feasible_constraints, -10000, 10000)
 
         letter = child[0]
         hour = child[1]
@@ -100,75 +151,47 @@ class Player:
 
         return hour, letter
 
-    def check_two_letter_constraint_viability(self, constraint, state, territory):
-        """Checks the viability of satisfying a two-letter constraint given the current state and territory.
+    def is_constraint_feasible(self, constraint, state, cards):
+        """Check if a given constraint is feasible to satisfy with the current state and cards."""
+        letters_in_constraint = constraint.split("<")
+        missing_from_state = [letter for letter in letters_in_constraint if letter not in state]
 
-        Args:
-            constraint (str): The constraint string to check, in the format "A<B".
-            state (list): The current state of the board, a list containing letters at each hour position.
-            territory (list): The current state of territory ownership.
-
-        Returns:
-            bool: True if it's viable to satisfy the constraint, otherwise False.
-
-        This method checks whether a two-letter constraint can be satisfied given the current state and available slots. It returns True if there is a viable option to play a card that satisfies the constraint, otherwise it returns False.
-        """
-        list_of_letters = constraint.split("<")
-        letter_positions = [state.index(letter) if letter in state else None for letter in list_of_letters]
-        available_slots = [i for i, val in enumerate(territory) if val == 4]
-
-        if letter_positions[1] is None and letter_positions[0] is not None:
-            for slot in available_slots:
-                if 0 < (slot - letter_positions[0]) % 12 <= 5:
-                    return True
-        return False
+        # If all missing letters are not in cards, then it's not feasible
+        if all(letter not in cards for letter in missing_from_state):
+            return False
+        return True
 
     def minimize(self, cards, state, territory, constraints, alpha, beta):
-        """Minimizes the utility value in the minimax algorithm with alpha-beta pruning.
-
-        Args:
-            cards (list): List of available cards to play.
-            state (list): Current state of the board.
-            territory (list): Current territory ownership status.
-            constraints (list): List of constraints to satisfy.
-            alpha (int): The current alpha value for alpha-beta pruning.
-            beta (int): The current beta value for alpha-beta pruning.
-
-        Returns:
-            tuple: A tuple containing the best move and its utility value.
-
-        This method represents the minimizing player in the minimax algorithm. It explores possible moves and evaluates them using the maximize method, attempting to minimize the utility value. Alpha-beta pruning is used to ignore branches with lower utility values.
-        """
+        """... (existing docstring) ..."""
 
         self.level += 1
         curr_time = time.process_time() - self.time
         availableMoves = self.getAvailableMoves(cards, territory)
         available_hours = np.where(np.array(territory) == 4)[0]
+        availableLetters = list(set(letters) - set(state) - set(cards))
 
         if len(available_hours) == 0 or curr_time >= 1:
             return [state, territory], self.getCurrentScore(constraints, state, territory)
 
-        availableLetters = list(set(letters) - set(state) - set(cards))
-
         minChild, minUtil = None, 10000
 
-        for i in range(2):
-            for j in available_hours:
-                if self.rng.random() <= (1 / float(len(available_hours))):
-                    availableLetters = list(set(letters) - set(state) - set(cards))
-                    state[j] = 'A'
-                    territory[j] = 0 if i == 0 else 2
+        for letter in availableLetters:  # Loop through all available letters
+            for i in range(2):
+                for j in available_hours:
+                    if self.rng.random() <= (1 / float(len(available_hours))):
+                        state[j] = letter  # Place the available letter
+                        territory[j] = 0 if i == 0 else 2
 
-                    other, util = self.maximize(cards, state, territory, constraints, alpha, beta)
-                    util += self.getCurrentScore(constraints, state, territory)
+                        other, util = self.minimize(cards, state, territory, constraints, alpha, beta)
+                        util += self.getCurrentScore(constraints, state, territory)
 
-                    if util < minUtil:
-                        minChild, minUtil = ['A', j], util
+                        if util < minUtil:
+                            minChild, minUtil = [letter, j], util
 
-                    if minUtil <= alpha:
-                        return minChild, minUtil
+                        if minUtil <= alpha:
+                            return minChild, minUtil
 
-                    beta = min(beta, minUtil)
+                        beta = min(beta, minUtil)
 
         return minChild, minUtil
 
