@@ -152,7 +152,7 @@ class Player:
                     score = score + score_value_list[len(list_of_letters) - 2]
         return score
 
-    def __select(self, tree: "Tree", alpha: float = 1):
+    def __select(self, tree: "Tree", alpha: float = 2.5):
         """Starting from state, move to child node with the
         highest UCT value.
 
@@ -232,7 +232,7 @@ class Player:
 
         return tree
 
-    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int = 5000):
+    def __MCTS(self, cards: list[str], constraints: list[str], state: list[str], rollouts: int = 2500):
         # MCTS main loop: Execute MCTS steps rollouts number of times
         # Then return successor with highest number of rollouts
         tree = Tree(Node(np.array(state), 24, 'Z', 0, 1))
