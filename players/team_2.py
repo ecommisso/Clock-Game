@@ -195,8 +195,23 @@ class Player:
     def make_backup_play(self, active_constraints, useful_letters, discard_letters, clock_letters):  # returns chosen_hour, chosen_letter
         available_hours = np.where(np.array(clock_letters) == 'Z')
         chosen_hour = self.rng.choice(available_hours[0])
+        # if there's no active constraint, then we can play any letter at the densest hour
+        if not active_constraints:
+            # print("OMGGGGGGG")
+            densest_hour = [0]*12
+            for i in range(24):
+                if clock_letters[i] == 'Z':
+                    densest_hour[i%12] += 1
+            chosen_letter = self.rng.choice(discard_letters)
+            for i in range(12):
+                if densest_hour[i] == 1:
+                    chosen_hour = i if i in available_hours[0] else i+12
+                    break
+            return chosen_hour, chosen_letter
         if discard_letters:
             chosen_letter = self.rng.choice(discard_letters)
+            # we don't want to play in spots that would block our constraints
+            # we want to choose the hour that is outside of the range of our contraints
         else:  # If there's no discard, then we have to play a useful, starting from the shortest constraint
             chosen_letter = None
             for constraint in reversed(active_constraints):
@@ -279,4 +294,3 @@ class UsefulLetterStats:
                     else:
                         continue
                     break
-
