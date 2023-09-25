@@ -1,31 +1,61 @@
 The game.....has started.
-Move 1 : player 1 ,time 0.5445437431335449s, C at 3
-Move 2 : player 2 ,time 0.0008399486541748047s, I at 12
-Move 3 : player 3 ,time 5.7697296142578125e-05s, X at 2
-Move 1 : player 1 ,time 0.47738099098205566s, V at 11
-Move 2 : player 2 ,time 7.581710815429688e-05s, U at 5
-Move 3 : player 3 ,time 8.487701416015625e-05s, F at 9
-Move 1 : player 1 ,time 0.4098379611968994s, O at 10
-Move 2 : player 2 ,time 9.012222290039062e-05s, B at 8
-Move 3 : player 3 ,time 2.288818359375e-05s, D at 3
-Move 1 : player 1 ,time 0.32845115661621094s, A at 11
-Move 2 : player 2 ,time 6.604194641113281e-05s, W at 1
-Move 3 : player 3 ,time 2.1219253540039062e-05s, J at 4
-Move 1 : player 1 ,time 0.25402092933654785s, E at 1
-Move 2 : player 2 ,time 7.390975952148438e-05s, R at 12
-Move 3 : player 3 ,time 3.790855407714844e-05s, T at 4
-Move 1 : player 1 ,time 0.17354798316955566s, M at 10
-Move 2 : player 2 ,time 6.198883056640625e-05s, L at 9
-Move 3 : player 3 ,time 3.409385681152344e-05s, Q at 8
-Move 1 : player 1 ,time 0.1041710376739502s, K at 2
-Move 2 : player 2 ,time 7.200241088867188e-05s, H at 5
-Move 3 : player 3 ,time 3.409385681152344e-05s, N at 7
-Move 1 : player 1 ,time 0.057881832122802734s, S at 6
-Move 2 : player 2 ,time 6.699562072753906e-05s, P at 6
-Move 3 : player 3 ,time 1.8835067749023438e-05s, G at 7
-Player 1 has score 4 with satistied constraints ['U<O<C', 'B<E', 'H<M'] unsatisfied constraints ['W<O<A<M<Q'] and initial constraints ['B<E', 'U<O<C', 'U<X<L<T', 'W<O<A<M<Q', 'H<M']
-Player 2 has score -4 with satistied constraints [] unsatisfied constraints ['W<F', 'R<S<K<I', 'U<E<N<H<G', 'E<Q'] and initial constraints ['W<F', 'H<A<W', 'R<S<K<I', 'U<E<N<H<G', 'E<Q']
-Player 3 has score 0 with satistied constraints ['J<N'] unsatisfied constraints ['U<D<X<P'] and initial constraints ['D<T', 'R<A<I', 'U<D<X<P', 'C<Q<R<I<D', 'J<N']
+Move 1 : player 1 ,time 0.0005271434783935547s, C at 4
+Move 2 : player 2 ,time 0.017057180404663086s, P at 1
+Move 3 : player 3 ,time 0.5731019973754883s, F at 12
+Move 1 : player 1 ,time 0.00016307830810546875s, V at 7
+Move 2 : player 2 ,time 0.010859012603759766s, I at 3
+Move 3 : player 3 ,time 0.5832970142364502s, X at 12
+Move 1 : player 1 ,time 0.00020503997802734375s, S at 6
+Move 2 : player 2 ,time 0.021864891052246094s, B at 5
+Move 3 : player 3 ,time 0.49471378326416016s, T at 4
+Move 1 : player 1 ,time 0.0007748603820800781s, K at 8
+Move 2 : player 2 ,time 0.01213836669921875s, U at 10
+Move 3 : player 3 ,time 0.2873401641845703s, D at 8
+Move 1 : player 1 ,time 0.000148773193359375s, M at 7
+Move 2 : player 2 ,time 0.0050411224365234375s, R at 9
+Move 3 : player 3 ,time 0.3906083106994629s, J at 5
+Move 1 : player 1 ,time 0.0005130767822265625s, O at 10
+Move 2 : player 2 ,time 0.0002968311309814453s, L at 2
+Move 3 : player 3 ,time 0.1345212459564209s, Q at 9
+Move 1 : player 1 ,time 0.00015115737915039062s, E at 3
+Move 2 : player 2 ,time 0.00014495849609375s, W at 11
+Move 3 : player 3 ,time 0.11382293701171875s, N at 11
+Move 1 : player 1 ,time 0.0001499652862548828s, A at 2
+Move 2 : player 2 ,time 0.00029587745666503906s, H at 6
+Move 3 : player 3 ,time 0.0006351470947265625s, G at 1
+Player 1 has score -57 with satistied constraints ['A<S<D', 'M<X<E', 'S<O<E', 'M<O<F', 'O<L<S', 'R<A<I', 'L<I<V<O', 'J<O<W<P', 'J<S<R<N<L', 'H<M', 'N<E', 'Q<A', 'O<L', 'A<B', 'V<D', 'G<E', 'K<N', 'C<H', 'F<C', 'N<A', 'J<K', 'A<I', 'F<A', 'L<V', 'O<P<L', 'P<T<K', 'Q<N<C', 'E<H<D'] unsatisfied constraints ['W<O<A<M<Q', 'U<V<K<E<G', 'P<K<M<H<V', 'E<S<Q<K<P', 'V<O<J<A<H', 'Q<K<G<V<I', 'L<M<F<E<N', 'Q<A<J<C<P', 'G<K<X<M<L', 'G<A<T<E<J', 'R<S<K<I', 'X<A<S<T', 'E<O<S<H', 'N<M<S<G', 'O<V<R<K', 'M<A<K<W', 'R<C<E<M', 'V<I<E<K', 'N<C<G<V', 'X<A<B<C', 'W<O<M<L<U', 'V<O<A<P<H', 'Q<R<A<C<B', 'I<L<S<M<W', 'S<M<D<F<O', 'J<P<V<C<U', 'M<B<E<I<L', 'R<W<M<F<K', 'L<A<U<G<S', 'S<T<F<E<D', 'S<X<L<O<Q', 'C<U<F<M<N', 'U<O<C', 'I<E<S', 'M<A<W', 'K<C<F', 'M<C<Q', 'K<E<W', 'K<A<X', 'K<O<T', 'V<S<A', 'F<M<C', 'H<A<W', 'N<K<X', 'D<S<I', 'P<M<T', 'H<C<U', 'H<C<W', 'C<O<P<H', 'D<I<V<A', 'O<E<W<U', 'S<A<F<J', 'C<A<U<W', 'A<V<F<X', 'S<R<J<A', 'O<V<I<F', 'H<B<E<U', 'I<J<C<R', 'H<T<A<J', 'B<U<O<T', 'J<U<K<B', 'D<X<K<L', 'Q<V<R<W', 'N<Q<B<E<K', 'X<D<P<E<A', 'M<O<T<U<G', 'E<Q<X<W<M', 'L<F<U<C<K', 'D<B<E<T<H', 'U<E<N<H<G', 'P<Q<H<K<B', 'D<A<F<I<T', 'R<K<U<F<D', 'G<E<I<J<L', 'X<T<G<O<U', 'W<P<A<G<D', 'B<E', 'E<Q', 'Q<C', 'D<S', 'K<E', 'M<E', 'I<A', 'C<G', 'O<V', 'Q<V', 'V<T', 'K<J', 'D<C', 'D<E', 'V<I', 'X<K', 'X<M', 'S<B', 'A<K', 'F<K', 'F<D<A', 'N<B<A', 'M<G<W', 'O<B<F', 'E<G<P', 'N<F<O', 'M<N<U', 'E<Q<L', 'A<I<P', 'S<U<D', 'K<T<P', 'K<P<N<F', 'R<B<G<A', 'R<W<I<E', 'C<H<U<B', 'A<W<G<L', 'E<B<G<X', 'W<X<H<K', 'A<N<H<G', 'P<Q<R<C', 'B<H<I<A', 'T<I<H<X<M', 'F<R<P<G<O', 'P<D<F<T<S', 'C<Q<R<I<D', 'C<X<W<G<L', 'C<D<U<W<H', 'S<Q<P<L<N', 'O<H<T<X<L', 'S<B<J<L<Q'] and initial constraints ['B<E', 'U<O<C', 'U<X<L<T', 'W<O<A<M<Q', 'H<M', 'D<H<R', 'K<P<N<F', 'D<B<E<T<H', 'W<F', 'H<A<W', 'R<S<K<I', 'U<E<N<H<G', 'E<Q', 'O<P<L', 'C<O<P<H', 'T<I<H<X<M', 'D<T', 'R<A<I', 'U<D<X<P', 'C<Q<R<I<D', 'J<N', 'N<K<X', 'D<I<V<A', 'W<O<M<L<U', 'N<E', 'A<S<D', 'H<B<E<U', 'C<X<W<G<L', 'Q<C', 'G<T<R', 'R<B<G<A', 'U<V<K<E<G', 'Q<A', 'I<E<S', 'L<I<V<O', 'E<S<Q<K<P', 'D<S', 'M<X<E', 'O<E<W<U', 'Q<K<G<V<I', 'W<J', 'U<Q<I', 'S<A<F<J', 'P<K<M<H<V', 'B<Q', 'M<A<W', 'X<A<S<T', 'J<S<R<N<L', 'O<L', 'N<F<U', 'E<O<S<H', 'V<O<A<P<H', 'A<B', 'F<D<A', 'Q<J<G<D', 'N<Q<B<E<K', 'K<E', 'L<J<G', 'R<W<I<E', 'C<D<U<W<H', 'M<E', 'N<B<A', 'J<O<W<P', 'F<R<P<G<O', 'W<U', 'D<S<I', 'N<M<S<G', 'S<Q<P<L<N', 'I<A', 'P<T<K', 'B<H<J<R', 'M<B<E<I<L', 'V<D', 'H<U<D', 'C<A<U<W', 'Q<R<A<C<B', 'C<G', 'K<C<F', 'C<H<U<B', 'T<R<D<I<W', 'H<N', 'J<X<R', 'I<U<R<D', 'B<N<H<I<W', 'O<V', 'P<M<T', 'N<C<G<V', 'S<T<F<E<D', 'Q<V', 'M<C<Q', 'F<B<H<T', 'X<D<P<E<A', 'G<E', 'S<O<E', 'X<A<B<C', 'P<D<F<T<S', 'P<B', 'B<W<N', 'A<W<G<L', 'L<M<F<E<N', 'K<N', 'M<G<W', 'O<V<R<K', 'S<X<L<O<Q', 'H<J', 'B<J<L', 'E<B<G<X', 'L<F<J<Q<D', 'V<T', 'H<X<N', 'W<J<B<Q', 'P<Q<H<K<B', 'C<H', 'O<B<F', 'M<A<K<W', 'D<A<F<I<T', 'K<J', 'B<I<R', 'I<J<C<R', 'R<K<U<F<D', 'D<C', 'E<G<P', 'A<V<F<X', 'I<L<S<M<W', 'F<C', 'N<F<O', 'R<C<E<M', 'G<E<I<J<L', 'N<A', 'H<C<U', 'W<X<H<K', 'S<M<D<F<O', 'D<E', 'U<X<H', 'S<R<J<A', 'Q<A<J<C<P', 'F<W', 'M<N<U', 'A<N<H<G', 'N<G<L<D<J', 'V<I', 'M<O<F', 'D<X<I<U', 'G<K<X<M<L', 'X<K', 'E<Q<L', 'H<T<A<J', 'X<T<G<O<U', 'X<M', 'Q<N<C', 'B<U<O<T', 'J<P<V<C<U', 'N<F', 'O<L<S', 'J<U<K<B', 'W<R<J<G<P', 'S<B', 'E<H<D', 'O<V<I<F', 'C<U<F<M<N', 'A<K', 'K<E<W', 'N<H<J<X', 'G<A<T<E<J', 'J<Q', 'A<I<P', 'D<X<K<L', 'R<W<M<F<K', 'L<T', 'H<C<W', 'R<T<D<L', 'V<O<J<A<H', 'J<K', 'K<A<X', 'V<I<E<K', 'O<H<T<X<L', 'A<I', 'K<O<T', 'Q<V<R<W', 'M<O<T<U<G', 'R<X', 'I<L<H', 'P<Q<R<C', 'E<Q<X<W<M', 'F<A', 'V<S<A', 'U<F<T<I', 'W<P<A<G<D', 'O<L', 'S<U<D', 'N<P<L<W', 'S<B<J<L<Q', 'F<K', 'K<T<P', 'J<G<R<Q', 'L<A<U<G<S', 'L<V', 'F<M<C', 'B<H<I<A', 'L<F<U<C<K']
+Player 2 has score 18 with satistied constraints ['H<R', 'B<U<A<H', 'B<H<W<L<S'] unsatisfied constraints ['B<A<H'] and initial constraints ['U<O', 'M<N<G', 'V<W<I<O', 'P<J<S<X<F', 'F<J', 'J<H<D', 'Q<C<G<S', 'B<H<W<L<S', 'N<X', 'N<F<I', 'I<B<Q<S', 'H<J<A<C<F', 'A<V', 'Q<O<K', 'D<O<V<I', 'M<D<L<R<B', 'O<S', 'T<D<P', 'J<U<K<A', 'L<J<K<N<F', 'A<G', 'N<P<Q', 'S<C<I<M', 'P<F<O<V<T', 'D<X', 'A<M<N', 'C<H<D<O', 'W<X<G<P<J', 'L<T', 'I<C<A', 'K<R<J<H', 'U<I<K<C<G', 'Q<B', 'M<A<G', 'J<S<E<R', 'X<T<R<G<J', 'I<H', 'R<A<K', 'D<J<E<G', 'J<L<K<Q<P', 'C<S', 'A<X<I', 'T<C<H<D', 'S<H<N<F<P', 'H<R', 'O<A<C', 'W<B<V<G', 'W<A<E<I<J', 'T<H', 'I<N<R', 'B<O<V<H', 'U<C<S<R<P', 'V<I', 'S<V<N', 'J<V<K<R', 'J<T<D<W<V', 'P<C', 'N<I<K', 'F<E<R<V', 'A<O<X<W<T', 'J<W', 'D<E<O', 'E<U<P<K', 'A<S<M<W<F', 'I<P', 'B<A<E', 'B<U<A<H', 'W<O<G<D<F', 'S<M', 'S<M<T', 'T<C<H<B', 'L<B<I<U<M', 'P<O', 'Q<S<G', 'Q<R<E<V', 'J<L<D<O<X', 'I<D', 'J<U<L', 'N<O<I<F', 'W<N<F<C<G', 'E<I', 'Q<A<O', 'O<T<K<E', 'W<E<R<V<H', 'P<M', 'G<A<W', 'S<I<K<A', 'R<U<C<M<J', 'F<U', 'U<W<X', 'V<G<C<A', 'L<X<W<J<C', 'J<N', 'P<S<G', 'P<F<R<N', 'H<L<R<C<S', 'I<X', 'A<M<S', 'J<S<T<G', 'D<M<X<Q<L', 'U<I', 'Q<R<N', 'E<X<B<M', 'F<K<C<A<B', 'K<X', 'K<S<R', 'L<W<F<P', 'D<M<L<V<X', 'B<E', 'M<Q<C', 'M<L<C<E', 'I<F<B<S<X', 'G<X', 'B<A<H', 'V<H<T<O', 'O<X<W<H<A', 'C<H', 'F<V<R', 'X<N<S<K', 'N<J<M<P<D', 'S<C', 'D<L<B', 'Q<P<E<U', 'S<D<V<K<A', 'G<V', 'B<A<P', 'P<X<L<W', 'E<P<C<G<T', 'H<F', 'L<P<C', 'F<M<S<I', 'P<J<T<H<W', 'B<J', 'J<W<E', 'P<E<S<T', 'V<A<S<E<Q', 'D<E', 'O<F<C', 'E<H<A<P', 'O<W<Q<F<T', 'P<G', 'U<N<L', 'H<N<V<D', 'C<I<E<X<U', 'L<C', 'K<S<F', 'F<V<D<B', 'R<E<B<D<X', 'K<T', 'M<R<V', 'U<L<B<M', 'N<D<O<G<S', 'U<N', 'A<W<E', 'C<S<U<L', 'M<T<N<G<S', 'U<K', 'N<S<K', 'I<R<X<N', 'D<E<J<R<B', 'G<U', 'E<G<F', 'C<E<O<H', 'V<U<N<G<M', 'O<G', 'I<J<C', 'S<F<W<B', 'H<W<F<B<J', 'V<C', 'K<S<O', 'H<V<R<I', 'U<C<V<R<D', 'N<A', 'H<N<X', 'W<N<D<B', 'E<J<K<A<X', 'M<B', 'A<P<X', 'A<W<V<S', 'Q<M<A<O<T', 'I<D', 'T<K<E', 'J<D<S<L', 'S<F<G<U<Q', 'O<W', 'A<G<I', 'W<E<L<U', 'X<D<S<P<G', 'X<J', 'N<O<D', 'O<V<L<E', 'A<J<C<B<W', 'X<H', 'E<H<L', 'E<O<K<U', 'U<O<S<J<G', 'L<Q', 'K<R<P', 'P<Q<F<E', 'P<H<O<I<S']
+Player 3 has score -5 with satistied constraints ['G<T', 'N<T', 'F<J', 'J<M<D<P', 'D<R', 'M<N<X', 'C<D', 'Q<L', 'Q<P', 'U<F<J', 'R<F', 'I<D<Q<F<P', 'O<X', 'W<G', 'S<N', 'G<J', 'D<F<A', 'I<J'] unsatisfied constraints ['H<X', 'J<Q<O<M', 'D<V<J', 'E<Q', 'N<E<I<J', 'H<T', 'F<P<Q', 'D<X<C<Q<H', 'Q<X<S', 'T<C', 'R<D<F<X', 'Q<M', 'X<N', 'I<T<N<G<E', 'S<J', 'T<G<L', 'M<G<H<X', 'F<N<C<T<P', 'J<L<F<Q', 'F<J<W', 'Q<E<F<C', 'D<V<F<X', 'U<T', 'X<J<W', 'V<X<D<P', 'X<R', 'X<P<Q', 'V<G<D<M', 'J<Q<R<X', 'F<X<H<Q<P', 'C<T', 'B<J<Q<K', 'A<X<T<S<J', 'X<O', 'H<D<P<Q', 'D<C', 'T<J<G<M', 'C<X', 'G<R<F<O', 'J<G<T<P', 'X<H', 'L<U<T<J', 'I<Q', 'H<T<W<Q', 'N<G<D<K<H'] and initial constraints ['H<X', 'O<D<S', 'D<L<E<S', 'W<S<N<M<X', 'R<B', 'P<W<I', 'K<G<C<V', 'P<S<J<X<R', 'G<T', 'I<E<S', 'J<Q<O<M', 'L<B<C<V<A', 'N<T', 'D<V<J', 'S<P<N<V', 'R<N<B<I<F', 'C<K', 'X<S<I', 'U<I<K<W', 'I<T<O<V<G', 'E<Q', 'I<S<D', 'N<E<I<J', 'M<S<N<H<R', 'C<O', 'T<O<S', 'O<M<L<T', 'O<J<K<W<S', 'H<T', 'F<P<Q', 'C<K<W<H', 'D<X<C<Q<H', 'F<J', 'W<F<P', 'K<L<R<A', 'S<O<C<I<M', 'O<R', 'Q<X<S', 'I<W<U<E', 'L<C<K<U<F', 'T<C', 'N<K<A', 'R<D<F<X', 'J<C<I<G<S', 'Q<M', 'S<X<L', 'E<X<O<L', 'V<O<N<E<I', 'X<N', 'H<U<X', 'J<M<D<P', 'I<T<N<G<E', 'H<A', 'L<F<V', 'L<K<R<W', 'K<F<O<M<A', 'B<V', 'F<U<E', 'L<F<O<E', 'M<L<V<Q<P', 'H<B', 'L<H<W', 'H<D<R<M', 'W<T<U<K<D', 'S<J', 'T<G<L', 'I<O<Q<S', 'F<R<J<U<V', 'O<H', 'E<R<Q', 'M<G<H<X', 'S<L<B<U<V', 'D<R', 'D<E<I', 'C<J<B<I', 'F<N<C<T<P', 'O<E', 'S<I<R', 'K<H<P<G', 'H<J<F<B<S', 'C<R', 'M<N<X', 'Q<H<O<L', 'Q<W<P<K<T', 'L<U', 'K<A<H', 'J<L<F<Q', 'U<M<V<Q<P', 'I<K', 'F<J<W', 'Q<E<F<C', 'U<Q<J<P<H', 'U<O', 'A<C<X', 'D<V<F<X', 'S<T<B<D<P', 'U<T', 'I<N<V', 'X<A<U<P', 'W<F<R<A<D', 'C<D', 'R<E<A', 'V<L<E<I', 'W<X<V<A<I', 'O<W', 'X<J<W', 'S<U<P<M', 'M<B<N<R<F', 'W<C', 'U<I<V', 'V<X<D<P', 'U<M<N<G<K', 'X<R', 'X<P<Q', 'E<B<V<N', 'K<V<G<S<J', 'C<E', 'P<B<E', 'J<B<R<P', 'Q<O<C<U<F', 'Q<L', 'X<L<M', 'B<W<V<N', 'R<P<L<E<W', 'Q<P', 'E<H<U', 'W<H<V<X', 'I<J<R<B<G', 'I<K', 'U<F<J', 'M<D<K<H', 'R<P<L<J<I', 'L<K', 'X<A<S', 'V<G<D<M', 'Q<R<M<J<K', 'O<E', 'J<N<G', 'W<T<M<O', 'I<E<O<R<D', 'R<F', 'O<G<W', 'J<Q<R<X', 'F<X<H<Q<P', 'C<T', 'B<X<O', 'B<J<Q<K', 'A<X<T<S<J', 'X<O', 'G<P<R', 'H<D<P<Q', 'O<T<G<I<H', 'D<C', 'A<U<O', 'B<C<L<N', 'I<D<Q<F<P', 'O<X', 'W<O<P', 'T<J<G<M', 'A<V<K<O<Q', 'C<X', 'M<U<O', 'G<R<F<O', 'V<U<H<L<A', 'W<G', 'R<O<E', 'J<G<T<P', 'A<M<B<F<W', 'U<I', 'Q<E<H', 'O<P<V<M', 'E<K<V<J<W', 'X<H', 'L<B<I', 'I<E<F<V', 'G<P<R<D<H', 'S<N', 'A<T<W', 'L<U<T<J', 'U<B<L<E<G', 'G<J', 'D<F<A', 'H<R<M<V', 'G<F<J<D<C', 'I<J', 'U<M<C', 'S<J<M<C', 'M<T<V<N<E', 'I<Q', 'U<A<Q', 'V<E<O<G', 'L<S<V<R<W', 'S<L', 'E<C<U', 'G<I<E<U', 'A<O<B<E<W', 'P<R', 'M<H<U', 'H<T<W<Q', 'N<G<D<K<H']
+Congratulations Player 2 you are the winner!!!
+Time taken by player 1, 2 and 3 to choose : [0.009511947631835938, 0.0015549659729003906, 0.0006241798400878906]
+Total time taken by player 1, 2 and 3 to decide moves : [0.0026330947875976562, 0.06769824028015137, 2.578040599822998]
+Move 1 : player 1 ,time 0.00022673606872558594s, C at 4
+Move 2 : player 2 ,time 0.0002810955047607422s, R at 4
+Move 3 : player 3 ,time 0.0003209114074707031s, Q at 3
+Move 1 : player 1 ,time 0.00013327598571777344s, E at 11
+Move 2 : player 2 ,time 0.0009369850158691406s, H at 8
+Move 3 : player 3 ,time 0.0001938343048095703s, T at 8
+Move 1 : player 1 ,time 9.703636169433594e-05s, K at 5
+Move 2 : player 2 ,time 0.047911882400512695s, W at 12
+Move 3 : player 3 ,time 0.00011110305786132812s, F at 1
+Move 1 : player 1 ,time 8.606910705566406e-05s, O at 2
+Move 2 : player 2 ,time 0.04669809341430664s, U at 12
+Move 3 : player 3 ,time 7.510185241699219e-05s, G at 11
+Move 1 : player 1 ,time 7.891654968261719e-05s, S at 6
+Move 2 : player 2 ,time 0.04580497741699219s, L at 2
+Move 3 : player 3 ,time 7.390975952148438e-05s, D at 5
+Move 1 : player 1 ,time 8.082389831542969e-05s, V at 9
+Move 2 : player 2 ,time 0.044679880142211914s, B at 3
+Move 3 : player 3 ,time 8.225440979003906e-05s, N at 6
+Move 1 : player 1 ,time 8.0108642578125e-05s, M at 1
+Move 2 : player 2 ,time 0.04446578025817871s, P at 10
+Move 3 : player 3 ,time 7.891654968261719e-05s, X at 7
+Move 1 : player 1 ,time 7.796287536621094e-05s, A at 7
+Move 2 : player 2 ,time 0.043138742446899414s, I at 9
+Move 3 : player 3 ,time 8.177757263183594e-05s, J at 10
+Player 1 has score 2 with satistied constraints ['U<O<C'] unsatisfied constraints ['B<E'] and initial constraints ['B<E', 'U<O<C']
+Player 2 has score 0 with satistied constraints ['H<M'] unsatisfied constraints ['D<H<R'] and initial constraints ['H<M', 'D<H<R']
+Player 3 has score 1 with satistied constraints ['W<F'] unsatisfied constraints [] and initial constraints ['W<F', 'H<A<W']
 Congratulations Player 1 you are the winner!!!
-Time taken by player 1, 2 and 3 to choose : [3.266334533691406e-05, 0.0014033317565917969, 3.0994415283203125e-06]
-Total time taken by player 1, 2 and 3 to decide moves : [2.3498356342315674, 0.0013468265533447266, 0.0003116130828857422]
+Time taken by player 1, 2 and 3 to choose : [3.123283386230469e-05, 0.0001838207244873047, 2.9087066650390625e-05]
+Total time taken by player 1, 2 and 3 to decide moves : [0.0008609294891357422, 0.27391743659973145, 0.0010178089141845703]

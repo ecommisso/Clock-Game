@@ -9,7 +9,7 @@ from players.default_player import Player as Default_Player
 from players.team_1 import Player as p1
 from players.team_2 import Player as p2
 from players.team_3 import Player as p3
-from players.default_player import Player as p4
+from players.team_4 import Player as p4
 from players.team_5 import Player as p5
 from players.team_6 import Player as p6
 from players.team_7 import Player as p7
@@ -602,8 +602,7 @@ class  clockGame():
                 if self.use_gui:
                     self.clockapp_instance["game_actions"].append([letter, hour])
                 self.add_to_log(2, letter, hour)
-                #print(self.clockapp_instance["game_actions"])
-                #print("hi")
+                
                 self.end_time = time.time()
                 if self.end_time - self.start_time > self.max_time: #timekeeping aspect
                     print("Simulation terminated due to excess time taken.")
