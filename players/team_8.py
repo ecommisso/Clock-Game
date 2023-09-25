@@ -58,6 +58,7 @@ class Player:
         """
         final_constraints = []
         constraint_heap = []
+        score_threshold = 1.3
 
         for constraint in constraints:
             precense_sbscore, alternating_sbscore, doubles_sbscore = 0, 0, 1
@@ -98,14 +99,25 @@ class Player:
 
             if data_mode:
                 with open("data.txt", "a") as file1:
-                    file1.write("\n" + constraint + " present: " + str(precense_sbscore) +
-                                " alt: " + str(alternating_sbscore) + " doubles: " + str(doubles_sbscore) + " ...final pct: " + str(const_score))
+                    # file1.write("\n" + constraint + " present: " + str(precense_sbscore) +
+                    #             "\talt: " + str(alternating_sbscore) +
+                    #             "\tdoubles: " + str(doubles_sbscore) +
+                    #             "\t...final pct: " + str(const_score))
+
+                    if const_score >= score_threshold:
+                        line = "{:<{width}} presence: {:.3f}\talt: {:.3f}\tdbls: {:d}\t...final pct: {:.3f} !".format(
+                            constraint, precense_sbscore, alternating_sbscore, doubles_sbscore, const_score, width=10)
+                    else:
+                        line = "{:<{width}} presence: {:.3f}\talt: {:.3f}\tdbls: {:d}\t...final pct: {:.3f}".format(
+                            constraint, precense_sbscore, alternating_sbscore, doubles_sbscore, const_score, width=10)
+                    file1.write("\n" + line)
+
                     file1.flush()
 
         for _ in range(int(math.sqrt(float(len(constraints))) * 2)):
             if len(constraint_heap) != 0:
                 const = heapq.heappop(constraint_heap)
-                if const[0] <= -1.3:  # adding an additional threshold
+                if const[0] <= -score_threshold:  # adding an additional threshold
                     final_constraints.append(const[2])
                 # will pick the constraint no matter what the score is if we are in a one-constraint game
                 elif len(constraints) == 1:

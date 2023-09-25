@@ -7,7 +7,7 @@ given_cards = ["A", "B"]
 
 def all_possible_constraints():
     # Generate combinations of 1 to 5 letters (as each letter appears only once)
-    letters = ['A', 'B', 'C', 'D']
+    letters = ['A', 'B', 'C', 'D', 'E']
     all_permutations = []
 
     # Generate permutations of 2 to 5 letters (as each letter appears only once)
