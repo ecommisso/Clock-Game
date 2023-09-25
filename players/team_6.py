@@ -62,7 +62,11 @@ class Player:
             """
 
             # A dict keeping hardcoded probabilities for the three cases of two letter constraints
+<<<<<<< HEAD
             two_letter_probs = {0: 0.43478260869, 1: 0.58, 2: 1}
+=======
+            two_letter_probs = {0: 0.43478260869, 1: 0.75, 2: 1}
+>>>>>>> 7881d25 (team 6)
 
             # Points associated with each constraint size
             points_for_consts = {2: 1, 3: 3, 4: 6, 5: 12}
@@ -239,4 +243,8 @@ class Player:
         print("~~~~~~~~~~~Is Satisfied: ", is_satisfied, "~~~~~~~~~~~~~~~")
 
         hour = hour % 12 if hour % 12 != 0 else 12
+<<<<<<< HEAD
         return hour, letter
+=======
+        return hour, letter
+>>>>>>> 7881d25 (team 6)
