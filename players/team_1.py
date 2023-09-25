@@ -17,8 +17,7 @@ class Player:
             precomp_dir (str): Directory path to store/load precomputation
         """
         self.discardPile = []
-        self.lettersNeeded = []
-        self.nextPlay = None 
+        self.queue = []
         self.rng = rng
 
     #def choose_discard(self, cards: list[str], constraints: list[str]):
@@ -36,6 +35,7 @@ class Player:
 
         for constraint in constraints: 
         #check every constraint to make sure we have atleast 1 letter in every pair in constraint
+            if len(constraint) > 3: continue 
             if self.__checkPairs(cards, constraint): 
                 final_constraints.append(constraint)
 
@@ -46,6 +46,7 @@ class Player:
 
     #def play(self, cards: list[str], constraints: list[str], state: list[str], territory: list[int]) -> Tuple[int, str]:
     def play(self, cards, constraints, state, territory):
+        print("\ncards: ", cards)
         """Function which based n current game state returns the distance and angle, the shot must be played
 
         Args:
@@ -58,21 +59,54 @@ class Player:
         Returns:
             Tuple[int, str]: Return a tuple of slot from 1-12 and letter to be played at that slot
         """
-        #Do we want intermediate scores also available? Confirm pls
-        letter = None 
-        for constraint in constraints: 
-            if self.__haveAllLetters(cards, constraint): 
-                letter = constraint[0]
-                self.nextPlay = constraint[2]
-        if letter is None and self.nextPlay is not None: 
-            letter = self.nextPlay
-            self.nextPlay = None
-        elif letter is None:
-            letter = self.rng.choice(cards)
+        letter = None  #because np.where returns a tuple containing the array, not the array itself
+        hour = None          
         territory_array = np.array(territory)
         available_hours = np.where(territory_array == 4)
-        hour = self.rng.choice(available_hours[0])          #because np.where returns a tuple containing the array, not the array itself
-        hour = hour%12 if hour%12!=0 else 12
+        #parse all constraints
+        for constraint in constraints: 
+            #if we have all letters then play this constraint
+            if self.__haveAllLetters(cards, constraint): 
+                print("have all letters in ", constraint)
+                letter = constraint[0]
+                print("setting letter to ", letter)
+                self.queue.append(constraint[2])
+                break
+            elif len(constraint) == 3: 
+                #2 letter constraint where we have 1 letter, check that other letter was played 
+                playedAt = self.__wasPlayedAt(constraint[2], state)
+                if constraint[0] in cards and playedAt is not None: 
+                    print("playing ", constraint[0])
+                    letter = constraint[0]
+                    if letter in self.queue: self.queue.remove(letter)
+                    hour = self.__chooseHour(playedAt, state, False)
+                    break
+                playedAt = self.__wasPlayedAt(constraint[0], state)
+                if constraint[2] in cards and playedAt is not None: 
+                    print("playing ", constraint[2])
+                    letter = constraint[2]
+                    if letter in self.queue: self.queue.remove(letter)
+                    hour = self.__chooseHour(playedAt, state, True)
+                    break
+        #play next in queue if not empty
+        if letter is None and self.queue != []: 
+            print("letter is none and queue is not empty")
+            print("queue: ", self.queue)
+            letter = self.queue.pop()
+        #play from discard if not empty 
+        elif letter is None: 
+            if self.discardPile != []:
+                print("letter is none and discard pile is not empty")
+                letter = self.rng.choice(self.discardPile)
+                self.discardPile.remove(letter)
+            else: letter = self.rng.choice(cards)
+        
+        #territory_array = np.array(territory)
+        #available_hours = np.where(territory_array == 4)
+        print("these are the available hours:", available_hours)
+        if hour is None:   
+            hour = self.rng.choice(available_hours[0])
+            hour = hour%12 if hour%12!=0 else 12
         return hour, letter
     
     def __checkPairs(self, cards, constraint): 
@@ -88,23 +122,19 @@ class Player:
     #check if we have atleast 1 letter in pair of letters 
         return letter1 in cards or letter2 in cards
     
+    #create discard pile 
     def __organizeCards(self, cards, constraints):
-        for constraint in constraints: 
-            i = 0
-            while i < len(constraint): 
-                if constraint[i] not in cards and constraint[i] not in self.lettersNeeded: 
-                    self.lettersNeeded.append(constraint[i])
-                i += 2
-        
         for card in cards: 
             if self.__isDiscard(card, constraints): 
                 self.discardPile.append(card)
 
+    #determine if we have all letters in a constraint
     def __isDiscard(self, card, constraints): 
         for constraint in constraints: 
             if card in constraint: return False 
         return True 
 
+    #check if we have all letters in constraint
     def __haveAllLetters(self, cards, constraint): 
         i = 0 
         while i < len(constraint):  
@@ -112,5 +142,48 @@ class Player:
                 return False
             i+=2
         return True
+    
+    #check if letter was played
+    def __wasPlayedAt(self, letter, state): 
+        print("state: ", state)
+        for hour, letterAtHour in enumerate(state): 
+            if letter == letterAtHour: 
+                print("the hour is:", hour)
+                print("letter ", letter, " found at ", hour)
+                return hour
+        return None 
+    
+    #chooseHour that we want to play at when other letter in 2 letter constraint is played  
+    def __chooseHour(self, hourPlayed, state, clockwise):
+        if hourPlayed < 12: 
+            hourPlayed = hourPlayed + 12 
+        if clockwise:  
+            i = 1
+            while i < 6: 
+                hour = (hourPlayed+i)%24
+                print("hour in if: ", hour)
+                if state[hour] == 'Z': return hour
+                complimentary = self.__getComplimentary(hour)
+                if state[complimentary] == 'Z': return complimentary
+                i += 1 
+        else: 
+            i = 1 
+            while i < 6: 
+                hour = (hourPlayed-i)%24
+                print("hour: ", hour)
+                if state[hour] == 'Z': return hour 
+                complimentary = self.__getComplimentary(hour)
+                if state[complimentary] == 'Z': return complimentary
+                i += 1
+
+
+    def __getComplimentary(self, hour):
+        if hour >= 12: 
+            return hour%12
+        else: 
+            return hour+12
+
+        
+
 
 
