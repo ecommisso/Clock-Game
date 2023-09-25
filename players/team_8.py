@@ -108,7 +108,7 @@ class Player:
                 if const[0] <= -1.3:  # adding an additional threshold
                     final_constraints.append(const[2])
                 # will pick the constraint no matter what the score is if we are in a one-constraint game
-                if len(constraints) == 1 and len(final_constraints) == 0:
+                elif len(constraints) == 1:
                     final_constraints.append(const[2])
         return final_constraints
 
