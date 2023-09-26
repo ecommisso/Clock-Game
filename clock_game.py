@@ -15,7 +15,7 @@ from players.team_6 import Player as p6
 from players.team_7 import Player as p7
 from players.team_8 import Player as p8
 from players.team_9 import Player as p9
-from players.default_player import Player as p10
+from players.team_10 import Player as p10
 from players.default_player import Player as p11
 import time
 import pickle as pkl
