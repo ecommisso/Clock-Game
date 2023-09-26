@@ -6,6 +6,8 @@ n=1000
 p1="0"
 p2="0"
 p3="0"
+
+#don't touch these
 scores=(0 0 0)
 variance=(0 0 0)
 
