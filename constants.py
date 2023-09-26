@@ -1,9 +1,9 @@
 import os
 import argparse 
 
-timeout = 100000 # 10s aggregate time limit
+timeout = 500000 # 10s aggregate time limit
 number_of_constraints_pp = 5
-c = 100
+c = 10
 exact_pos = 20
 rng_seed = 5
 

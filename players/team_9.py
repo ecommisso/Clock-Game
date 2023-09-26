@@ -120,7 +120,7 @@ class Game:
             oppo_cons = list()
             for idx in range(len(constraints)): # create some random constraints for opponents  
                 cons_len = 2+(idx%4)
-                new_cons = Constraint(0,0,cons_len,0,"<".join(self.rng.choice(list(string.ascii_uppercase)[:24], cons_len, replace = False)))
+                new_cons = Constraint(0,0,cons_len,idx,"".join(self.rng.choice(list(string.ascii_uppercase)[:24], cons_len, replace = False)))
                 oppo_cons.append(new_cons)
             if myscore < self.__score_helper(good_pairs,oppo_cons): # beaten by a player
                 return 0
