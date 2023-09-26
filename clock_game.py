@@ -604,13 +604,13 @@ class  clockGame():
                 self.add_to_log(2, letter, hour)
                 
                 self.end_time = time.time()
-                if self.end_time - self.start_time > self.max_time: #timekeeping aspect
-                    print("Simulation terminated due to excess time taken.")
-                    with open("log_moves.txt", 'a' ) as f:
-                        f.write("Simulation terminated due to excess time taken.")
-                        f.write('\n')
-                    self.timeout = True
-                    break
+                #if self.end_time - self.start_time > self.max_time: #timekeeping aspect
+                #    print("Simulation terminated due to excess time taken.")
+                #    with open("log_moves.txt", 'a' ) as f:
+                #        f.write("Simulation terminated due to excess time taken.")
+                #        f.write('\n')
+                #    self.timeout = True
+                #    break
             if not self.timeout:    
                 print("Game over")
                 with open("clock_gui.pkl", "wb") as f:
