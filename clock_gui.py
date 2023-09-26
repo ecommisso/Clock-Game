@@ -100,6 +100,7 @@ class gui():
         
 
 
+
     def draw_letter(self, letter: str, position: int, player_number):
         global root_global
         global image_global
