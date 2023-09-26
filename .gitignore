@@ -153,3 +153,5 @@ precomp/
 
 # Dummy map
 maps/g9/simpleMap.json
+*.txt
+log_moves.txt
