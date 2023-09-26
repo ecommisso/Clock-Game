@@ -1,6 +1,6 @@
 Final result is as follows : 
-Scores for players 1, 2 and 3 : [2, 0, 1]
-Satisfied constraints for players 1, 2 and 3 : [['U<O<C'], ['H<M'], ['W<F']]
-total time taken to finish the game : 0.27999091148376465s
-Time taken by player 1, 2 and 3 to choose : [3.123283386230469e-05, 0.0001838207244873047, 2.9087066650390625e-05]
-Total time taken by player 1, 2 and 3 to decide moves : [0.0008609294891357422, 0.27391743659973145, 0.0010178089141845703]
+Scores for players 1, 2 and 3 : [-57, 18, -5]
+Satisfied constraints for players 1, 2 and 3 : [['A<S<D', 'M<X<E', 'S<O<E', 'M<O<F', 'O<L<S', 'R<A<I', 'L<I<V<O', 'J<O<W<P', 'J<S<R<N<L', 'H<M', 'N<E', 'Q<A', 'O<L', 'A<B', 'V<D', 'G<E', 'K<N', 'C<H', 'F<C', 'N<A', 'J<K', 'A<I', 'F<A', 'L<V', 'O<P<L', 'P<T<K', 'Q<N<C', 'E<H<D'], ['H<R', 'B<U<A<H', 'B<H<W<L<S'], ['G<T', 'N<T', 'F<J', 'J<M<D<P', 'D<R', 'M<N<X', 'C<D', 'Q<L', 'Q<P', 'U<F<J', 'R<F', 'I<D<Q<F<P', 'O<X', 'W<G', 'S<N', 'G<J', 'D<F<A', 'I<J']]
+total time taken to finish the game : 2.719287157058716s
+Time taken by player 1, 2 and 3 to choose : [0.009511947631835938, 0.0015549659729003906, 0.0006241798400878906]
+Total time taken by player 1, 2 and 3 to decide moves : [0.0026330947875976562, 0.06769824028015137, 2.578040599822998]

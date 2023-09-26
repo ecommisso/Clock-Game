@@ -20,6 +20,7 @@ class Player:
         """
         self.rng = rng
 
+        # Use this as a selection strategy during play making.
         self.curr_constraint_tally = None
 
     def constraint_parser(self, _constraint):
@@ -45,8 +46,10 @@ class Player:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
         final_constraints = []
-        print("Constraints given to us:", constraints)
-        print("Cards given to us:", cards)
+
+        
+        # print("Constraints given to us:", constraints)
+        # print("Cards given to us:", cards)
 
 
         def assign_score_to_const(_constraint, _cards):
@@ -62,39 +65,55 @@ class Player:
             """
 
             # A dict keeping hardcoded probabilities for the three cases of two letter constraints
-            two_letter_probs = {0: 0.43478260869, 1: 0.58, 2: 1}
+            two_letter_probs = {0: 0.43478260869, 1: 0.687, 2: 1} #this have been calculated and hard coded in 
 
             # Points associated with each constraint size
             points_for_consts = {2: 1, 3: 3, 4: 6, 5: 12}
 
-            print("Current constraint:", _constraint)
+            # print("Current constraint:", _constraint)
             lst_constraint = self.constraint_parser(_constraint)
-            print("List format constraint:", lst_constraint)
+            # print("List format constraint:", lst_constraint)
 
-            score = 1
-            for i in range(len(lst_constraint) - 1):
-                if lst_constraint[i] in _cards and lst_constraint[i+1] in _cards:
-                    score *= two_letter_probs[2]
+            #score = 1
+            def num_letters(constraint:list, _cards: list): #count number of letters in constraint 
+                num_letters = 0 
+                for letter in constraint:
+                    if letter in _cards:
+                        num_letters +=1 
+                return num_letters
 
-                elif (lst_constraint[i] in _cards and lst_constraint[i+1] not in _cards) or (lst_constraint[i] not in _cards and lst_constraint[i+1] in _cards):
-                    score *= two_letter_probs[1]
-
-                else:
-                    score *= two_letter_probs[0]
-
+            #calculate the number of letters you have in a constraint 
+            num_letters = num_letters(lst_constraint, _cards) 
+            #calculate expected probability of taking on that constraint 
+            score = probability_calculator(num_letters, len(lst_constraint))
+            '''print("constraint size: " + str(len(lst_constraint)))
+            print("num letters: " + str(num_letters))
+            print("score: " + str(score))'''
+            #return the expected value of taking that constraint 
             return score * points_for_consts[len(lst_constraint)] - (1-score)
 
+        if len(constraints) <= 3: #if 0 to 3 constraints 
+            expected_value_lowerbound = .05
+        
+        elif len(constraints) <= 10: #if 4 to 10 constraints 
+            expected_value_lowerbound = .1
+
+        elif len(constraints) <= 25: #if 11 to 25 constraints 
+            expected_value_lowerbound = .2
+        else: #if more than 25 constraints, be very selective 
+            expected_value_lowerbound = .35
 
         # loop over all the constraints
         for curr_const in constraints:
             curr_const_score = (assign_score_to_const(curr_const, cards))
-            print("Score assigned to current constraint is", curr_const_score)
-            if curr_const_score  >= 0:
+            # print("Score assigned to current constraint is", curr_const_score)
+            if curr_const_score  >= expected_value_lowerbound: #if this value is too high, it just chooses nothing  
                 final_constraints.append(curr_const)
 
+        # Look into conflicting constraints
         self.curr_constraint_tally = {const: False for const in final_constraints}
 
-        print("Final selected constraints:", final_constraints)
+        # print("Final selected constraints:", final_constraints)
         return final_constraints
 
     def is_2_const_satisfied(self, _two_const, _state):
@@ -217,11 +236,11 @@ class Player:
         """
         # Do we want intermediate scores also available? Confirm pls
         
-        print("\n***\n")
+        # print("\n***\n")
         
-        print("State: ", state)
-        print("Territory: ", territory)
-        print("Current Constraint Tally", self.curr_constraint_tally)
+        # print("State: ", state)
+        # print("Territory: ", territory)
+        # print("Current Constraint Tally", self.curr_constraint_tally)
 
         max_iter = 1000
         for i in range(max_iter):
@@ -236,7 +255,82 @@ class Player:
             if is_satisfied == 1:
                 break
         
-        print("~~~~~~~~~~~Is Satisfied: ", is_satisfied, "~~~~~~~~~~~~~~~")
+        # print("~~~~~~~~~~~Is Satisfied: ", is_satisfied, "~~~~~~~~~~~~~~~")
 
         hour = hour % 12 if hour % 12 != 0 else 12
         return hour, letter
+def probability_calculator(num_letters, constraint_length):
+    prob_yes_nol = 0.45
+    prob_yes_onel = 0.687894539465445
+    prob_yes_twol = 1
+    #combine expected value depending on scores
+    two_letter = prob_yes_onel*1 - (1-prob_yes_onel)
+    #three_letter -> 3 different ones
+    #num_letters = 1
+    if constraint_length == 2:
+        if num_letters == 0:
+            probability = prob_yes_nol
+        elif num_letters == 1:
+            probability = prob_yes_onel
+        else:
+            probability = prob_yes_twol 
+        
+    elif constraint_length == 3:
+        probability = prob_3letter(num_letters,prob_yes_nol,prob_yes_onel,prob_yes_twol)
+    elif constraint_length == 4:
+        probability = prob_4letter(num_letters,prob_yes_nol,prob_yes_onel,prob_yes_twol)
+    #elif constraint_length == 5:
+    else: #is 5 
+        probability = prob_5letter(num_letters,prob_yes_nol,prob_yes_onel,prob_yes_twol)
+    return probability 
+
+
+
+def prob_3letter(num_letters,prob_yes_nol,prob_yes_onel,prob_yes_twol):
+  if num_letters ==0:
+    prob = (prob_yes_nol**3)
+  elif num_letters == 1:
+    #2 constraints of 1 letter, and 1 of 0
+    prob = (prob_yes_onel**2)*(prob_yes_nol)
+  elif num_letters == 2:
+    #2 constraints of 1 letter, and 1 of 2
+    prob = (prob_yes_onel**2)*(prob_yes_twol)
+  else: #have all 3
+    prob = 1
+  return prob
+#using number of letters you have -> combine the number
+#if 1 letter -> 2
+def prob_4letter(num_letters,prob_yes_nol,prob_yes_onel,prob_yes_twol):
+  if num_letters ==0:
+    prob = ((prob_yes_nol)**4)
+  elif num_letters == 1:
+    #3 constraints of 1 letter, and 3 of 0
+    prob = ((prob_yes_onel)**3)*((prob_yes_nol)**3)
+  elif num_letters == 2:
+    #1 where you have both, 1 where you have none, 4 where you have 1
+    prob = ((prob_yes_onel)**4)*(prob_yes_twol)*(prob_yes_nol)
+  elif num_letters == 3:
+    #3 where yo have both, 3 where you have one
+    prob = ((prob_yes_onel)**3)*((prob_yes_twol)**3)
+  else: #have all 4
+    prob = 1 #as long as if you are pos 2/3 yo pick where 10 open slots remain #not exact cause up to 11 could be played before you go
+  return prob
+#five_letter
+def prob_5letter(num_letters,prob_yes_nol,prob_yes_onel,prob_yes_twol):
+  if num_letters ==0:
+    prob = ((prob_yes_nol)**5)
+  elif num_letters == 1:
+    #4 constraints of 1 letter, and 6 of 0
+    prob = ((prob_yes_onel)**4)*((prob_yes_nol)**6)
+  elif num_letters == 2:
+    #1 where you have both, 3 where you have none, 6 where you have 1
+    prob = ((prob_yes_onel)**6)*(prob_yes_twol)*(prob_yes_nol**3)
+  elif num_letters == 3:
+    #3 where yo have both, 6 where you have one, 1 where you have none
+    prob = ((prob_yes_onel)**6)*((prob_yes_twol)**3)*prob_yes_nol
+  elif num_letters == 4:
+    #4 where you have one, 6 where you have 2
+    prob = ((prob_yes_onel)**4)*((prob_yes_twol)**6)
+  else: #have all 5
+    prob = 1 #as long as if you are pos 2/3 yo pick where 10 open slots remain #not exact cause up to 11 could be played before you go
+  return prob

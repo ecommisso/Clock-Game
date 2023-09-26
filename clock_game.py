@@ -608,8 +608,7 @@ class  clockGame():
                 if self.use_gui:
                     self.clockapp_instance["game_actions"].append([letter, hour])
                 self.add_to_log(2, letter, hour)
-                #print(self.clockapp_instance["game_actions"])
-                #print("hi")
+                
                 self.end_time = time.time()
                 #if self.end_time - self.start_time > self.max_time: #timekeeping aspect
                 #    print("Simulation terminated due to excess time taken.")
