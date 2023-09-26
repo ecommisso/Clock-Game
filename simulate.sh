@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #iterations
-n=1000
+n=$1
 #players
-p1="0"
-p2="0"
-p3="0"
+p1=$2
+p2=$3
+p3=$4
 
 #don't touch these
 scores=(0 0 0)
