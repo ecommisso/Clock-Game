@@ -231,9 +231,15 @@ class  clockGame():
         with open("log_moves.txt", 'a') as f:
             f.write("Player 1 has score " + str(self.scores[0]) + " with satistied constraints " + str(self.satisfied_constraints[0]) + " unsatisfied constraints "+ str(unsatisfied_constraints[0]) + " and initial constraints "+ str(self.initial_constraints[0]))
             f.write('\n')
+            f.write("satistied constraints " + str(len(self.satisfied_constraints[0])) + " unsatisfied constraints "+ str(len(unsatisfied_constraints[0])) + " and initial constraints "+ str(len(self.initial_constraints[0])))
+            f.write('\n')
             f.write("Player 2 has score " + str(self.scores[1]) + " with satistied constraints " + str(self.satisfied_constraints[1]) + " unsatisfied constraints "+ str(unsatisfied_constraints[1]) + " and initial constraints "+ str(self.initial_constraints[1]))
             f.write('\n')
+            f.write("satistied constraints " + str(len(self.satisfied_constraints[1])) + " unsatisfied constraints "+ str(len(unsatisfied_constraints[1])) + " and initial constraints "+ str(len(self.initial_constraints[1])))
+            f.write('\n')
             f.write("Player 3 has score " + str(self.scores[2]) + " with satistied constraints " + str(self.satisfied_constraints[2]) + " unsatisfied constraints "+ str(unsatisfied_constraints[2]) + " and initial constraints "+ str(self.initial_constraints[2]))
+            f.write('\n')
+            f.write("satistied constraints " + str(len(self.satisfied_constraints[2])) + " unsatisfied constraints "+ str(len(unsatisfied_constraints[2])) + " and initial constraints "+ str(len(self.initial_constraints[2])))
             f.write('\n')
             if tie == False:
                 f.write("Congratulations Player "+str(winner)+" you are the winner!!!")
@@ -605,13 +611,13 @@ class  clockGame():
                 #print(self.clockapp_instance["game_actions"])
                 #print("hi")
                 self.end_time = time.time()
-                if self.end_time - self.start_time > self.max_time: #timekeeping aspect
-                    print("Simulation terminated due to excess time taken.")
-                    with open("log_moves.txt", 'a' ) as f:
-                        f.write("Simulation terminated due to excess time taken.")
-                        f.write('\n')
-                    self.timeout = True
-                    break
+                #if self.end_time - self.start_time > self.max_time: #timekeeping aspect
+                #    print("Simulation terminated due to excess time taken.")
+                #    with open("log_moves.txt", 'a' ) as f:
+                #        f.write("Simulation terminated due to excess time taken.")
+                #        f.write('\n')
+                #    self.timeout = True
+                #    break
             if not self.timeout:    
                 print("Game over")
                 with open("clock_gui.pkl", "wb") as f:
