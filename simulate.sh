@@ -5,10 +5,7 @@ n=$1
 p1=$2
 p2=$3
 p3=$4
-#don't touch these
-s1=()
-s2=()
-s3=()
+
 for i in `seq 0 $n`
 do
 	printf "$p1\n$p2\n$p3\n" | bash clock_game.sh True $RANDOM &&
