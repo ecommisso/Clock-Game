@@ -34,64 +34,52 @@ class Player:
         Returns:
             list[int]: Return the list of constraint cards that you wish to keep. (can look at the default player logic to understand.)
         """
-        all_constraints = []
         constraint_list = [Q.PriorityQueue(), Q.PriorityQueue(), Q.PriorityQueue(), Q.PriorityQueue()]
         for i in range(len(constraints)):
             letter_list = constraints[i]
             all_letters = letter_list.split('<')
             length_of_letters = len(all_letters)
             missing_letters = len([letter for letter in all_letters if letter not in cards])
-            # add constraints into priority queue based on expected value ranking
+            # add constraints into priority queue based on expected value ranking -> hard coded values
             if length_of_letters == 2:
                 if missing_letters == 0:
                     constraint_list[length_of_letters - 2].put((10, letter_list))
-                    all_constraints.append(letter_list)
                 elif missing_letters == 1:
                     constraint_list[length_of_letters - 2].put((11, letter_list))
-                    all_constraints.append(letter_list)
             elif length_of_letters == 3:
                 if missing_letters == 2 and all_letters[1] in cards:
                     constraint_list[length_of_letters - 2].put((9, letter_list))
-                    all_constraints.append(letter_list)
                 elif missing_letters == 1:
                     constraint_list[length_of_letters - 2].put((8, letter_list))
-                    all_constraints.append(letter_list)
                 elif missing_letters == 0:
                     constraint_list[length_of_letters - 2].put((7, letter_list))
-                    all_constraints.append(letter_list)
             elif length_of_letters == 4:
                 if missing_letters == 2:
                     constraint_list[length_of_letters - 2].put((6, letter_list))
-                    all_constraints.append(letter_list)
                 elif missing_letters == 1:
                     constraint_list[length_of_letters - 2].put((5, letter_list))
-                    all_constraints.append(letter_list)
                 elif missing_letters == 0:
                     constraint_list[length_of_letters - 2].put((3, letter_list))
-                    all_constraints.append(letter_list)
             elif length_of_letters == 5:
                 if missing_letters == 2:
                     constraint_list[length_of_letters - 2].put((4, letter_list))
-                    all_constraints.append(letter_list)
                 elif missing_letters == 1:
                     constraint_list[length_of_letters - 2].put((2, letter_list))
-                    all_constraints.append(letter_list)
                 elif missing_letters == 0:
                     constraint_list[length_of_letters - 2].put((1, letter_list))
-                    all_constraints.append(letter_list)
 
         final_tuples = []
-        # Pick constraints - currently takes top 3 constraints of each constraint size
+        # Pick constraints - currently takes top 1 constraint of each constraint size -> decided on after rounds of testing
         for i in range(len(constraint_list)):
-            # TODO: replace any dropped constraints from contradictions...
-            # TODO: mess around with optimal number of constraints to keep per length, so not set to 1 for each
             for j in range(1):
                 if not constraint_list[i].empty():
                     # count any singular contradiction as a contradiction
-                    # TODO: Think of better way to handle contradictions based on groupings when C get large...
                     constraint_tuple = constraint_list[i].get()
                     if not self.check_contradiction(constraint_tuple, final_tuples):
                         final_tuples.append(constraint_tuple)
+                    else:
+                        # if contradiction was found, add another constraint of this length 
+                        j -= 1
                 else:
                     break
         final_constraints = [x[1] for x in final_tuples]
