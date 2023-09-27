@@ -59,7 +59,12 @@ bash clock_game.sh True seed_number
 You can change the random seed, number of constraints per player and timeout by changing the values inside constants.py.
 
 
+### Check your results on a large number of runs (Code thanks to team 4)
 
+```bash
+bash simulate.sh (num_iterations) (p1) (p2) (p3)
+```
+This will print out average and standard deviation for num_iterations iterations.
 
 
 The final result and log files should look as shown in the file "Result_example.png".

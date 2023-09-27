@@ -1,12 +1,3 @@
-##########################################################
-# Goals:   
-# 1.) Fix the the minimax: See the logic behind choosing each play for each corresponding letter.
-# 2.) Fix choosing constraints. After several runs, come up with an efficient method of choosing constraints.
-# 3.) Fix the lag that occurs during game play.
-# 4.) Attempt to setup the google cloud to implement several runs and store each score in an excel document.
-# 5.) A way to check that a move will satisfy a constraint right in the current play 
-##########################################################
-
 import numpy as np
 from typing import List, Tuple
 import time 
@@ -57,12 +48,12 @@ class Player:
                         if(matches == 2):
                             final_constraints.append(constraints[i])
                     case 4:
-                        if(matches == 3):
+                        if(matches == 2):
                             final_constraints.append(constraints[i])
                         elif((curr[0] in cards and curr[2] in cards) or (curr[1] in cards and curr[3] in cards)):
                             final_constraints.append(constraints[i])
                     case 5:
-                        if(matches == 4):
+                        if(matches == 3):
                             final_constraints.append(constraints[i])
                         elif((curr[0] in cards and curr[2] in cards and curr[4] in cards)):
                             final_constraints.append(constraints[i]) 
@@ -104,11 +95,12 @@ class Player:
         score = self.get_score(state, cards, constraints)
         curr_time = time.process_time() - self.time
 
-        if curr_time >= 1:
+        available_hours = [i for i, hour in enumerate(state) if 'Z' in hour]
+
+        if len(available_hours)==0 or curr_time >= 0.1:
             score = self.get_score(state, cards, constraints)
             return state, score
 
-        available_hours = [i for i, hour in enumerate(state) if 'Z' in hour]
 
         if is_maximizing:  
             best_score = -1000
@@ -158,8 +150,8 @@ class Player:
         best_move, bestScore = self.minimax(new_state, new_cards, new_constraints, depth, True)
         letter = best_move[1]
         hour = best_move[0] % 12 or 12
-        print("MOVE = ", hour, ", ", letter)
-        print("score:", bestScore)
+        # print("MOVE = ", hour, ", ", letter)
+        # print("score:", bestScore)
         return hour, letter
 
     def get_score(self, state: List[str], cards: List[str], constraints: List[str]) -> float:
