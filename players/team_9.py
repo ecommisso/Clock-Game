@@ -1,17 +1,15 @@
 from dataclasses import dataclass
-from tokenize import String
-import numpy as np
-from typing import Tuple, List
-from itertools import tee, chain
 from datetime import timedelta, datetime
-from random import choice
+from itertools import tee, chain
 from math import sqrt, log
+from numpy.random import Generator
+from random import choice
 import string
 
 # Constants
 CALC_SECS = 1
 EXPLORE = sqrt(2)
-PENALTY = 1
+PENALTY = 2
 
 @dataclass(order=True)
 class Constraint:
@@ -22,11 +20,11 @@ class Constraint:
     s: str
 
 class Game:
-    def __init__(self, rng: np.random.Generator) -> None:
+    def __init__(self, rng: Generator) -> None:
         """Initialise the player with given skill.
 
         Args:
-            rng (np.random.Generator): numpy random number generator, use this for same player behvior across run
+            rng (Generator): numpy random number generator, use this for same player behvior across run
         """
         self.rng = rng
 
@@ -127,12 +125,12 @@ class Game:
         return 1
 
 class Player:
-    def __init__(self, rng: np.random.Generator) -> None:
+    def __init__(self, rng: Generator) -> None:
         """Initialise the player with given skill.
 
         Args:
             skill (int): skill of your player
-            rng (np.random.Generator): numpy random number generator, use this for same player behvior across run
+            rng (Generator): numpy random number generator, use this for same player behvior across run
             logger (logging.Logger): logger use this like logger.info("message")
             golf_map (sympy.Polygon): Golf Map polygon
             start (sympy.geometry.Point2D): Start location
@@ -282,7 +280,7 @@ class Player:
                 next_states = self.__prune(hand, next_states)
 
             if not is_npc and all((s in visits) for p, s in next_states):
-                logN = log(max(visits[state], 1))
+                logN = log(max(visits.get(state,0), 0))
 
                 _, move, state = max(
                     ((vals[s] / visits[s]) +
@@ -353,18 +351,13 @@ class Player:
         print(f"Next moves:")
         for p, s in next_states:
             print(f"{p}: {self.visits.get(s)}, {self.vals.get(s, 0) / self.visits.get(s, 1):.2f}")
-
-        
         mu_v, p =  max(
             (self.vals.get(s, 0) / self.visits.get(s, 1),
              p)
             for p, s in next_states
         )
-
         print(f"Played {p}: {mu_v:.2f}")
-
         h, a = p
         if not h:
             h = 12
-
         return h, a
