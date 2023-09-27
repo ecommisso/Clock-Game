@@ -241,7 +241,7 @@ class Player:
                 next_states = self.__prune(hand, next_states)
 
             if not is_npc and all((s in visits) for p, s in next_states):
-                logN = log(max(visits.get(state,0), 0))
+                logN = log(max(visits.get(state,1), 1))
 
                 _, move, state = max(
                     ((vals[s] / visits[s]) +
