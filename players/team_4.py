@@ -5,13 +5,11 @@ from typing import Tuple, List
 from itertools import tee, chain
 from datetime import timedelta, datetime
 from random import choice
-from statistics import mean, stdev
-from collections import defaultdict
 import string
 
 # Constants
 CALC_SECS = 1
-CONF = 1.96
+EXPLORE = np.sqrt(2)
 PENALTY = 1
 
 @dataclass(order=True)
@@ -102,10 +100,11 @@ class Player:
         self.rng = rng
 
         self.game = Game()
-        self.vals = defaultdict(list)
+        self.vals = {}
+        self.visits = {}
 
         self.calc_time = timedelta(seconds=CALC_SECS)
-        self.C = CONF
+        self.C = EXPLORE
 
         self.graph = None
         self.constraints = []
@@ -218,13 +217,14 @@ class Player:
         pruned = [(p, s) for p, s in states if p[1] == discard]
 
         return pruned
-
+    
     def __simulate(self, state):
-        vals, C = self.vals, self.C
+        visits, vals, C = self.visits, self.vals, self.C
         visited = set()
         
-        if state not in vals:
-            vals[state] = []
+        if state not in visits:
+            visits[state] = 0
+            vals[state] = 0
 
         expand = True
         while not (self.game.is_over(state)):
@@ -238,21 +238,23 @@ class Player:
             if not is_npc and len(hand) > 6:
                 next_states = self.__prune(hand, next_states)
 
-            if not is_npc and all((s in vals) for p, s in next_states):
+            if not is_npc and all((s in visits) for p, s in next_states):
+                logN = np.log(max(visits.get(state, 0), 1))
+
                 _, move, state = max(
-                    (mean(vals[s]) +
-                     C * (stdev(vals[s]) if len(vals[s]) > 1 else 0) / 
-                     np.sqrt(len(vals[s])), p, s)
+                    ((vals[s] / visits[s]) +
+                     C * np.sqrt(logN / visits[s]), p, s)
                     for p, s in next_states
                 )
             else:
-                no_visits = [(p, s) for p, s in next_states if s not in vals]
+                no_visits = [(p, s) for p, s in next_states if s not in visits]
                 move, state = choice(no_visits if len(no_visits) else next_states)
 
             # expand
-            if expand and state not in self.vals:
+            if expand and state not in self.visits:
                 expand = False
-                vals[state] = []
+                visits[state] = 0
+                vals[state] = 0
             
             visited.add(state)
 
@@ -260,10 +262,11 @@ class Player:
 
         # backpropagate
         for s in visited:
-            if s not in vals:
+            if s not in visits:
                 continue
-            vals[s].append(score)
-                
+            visits[s] += 1
+            vals[s] += score
+               
     def __encode_state(self, state, cards):
         hand = frozenset(cards) - frozenset(state)
 
@@ -306,11 +309,10 @@ class Player:
         print(f"Current state: {state}")
         print(f"Next moves:")
         for p, s in next_states:
-            print(f"{p}: {len(self.vals.get(s, []))}, {mean(self.vals.get(s, [0])):.2f}")
-
+            print(f"{p}: {self.visits.get(s)}, {self.vals.get(s, 0) / self.visits.get(s, 1):.2f}")
         
         mu_v, p =  max(
-            (mean(self.vals.get(s, [0])),
+            (self.vals.get(s, 0) / self.visits.get(s, 1),
              p)
             for p, s in next_states
         )
