@@ -9,7 +9,7 @@ import string
 
 # Constants
 CALC_SECS = 1
-EXPLORE = np.sqrt(2)
+CONF = 1.96
 PENALTY = 1
 
 @dataclass(order=True)
@@ -102,9 +102,11 @@ class Player:
         self.game = Game()
         self.vals = {}
         self.visits = {}
+        self.mean = {}
+        self.m2 = {}
 
         self.calc_time = timedelta(seconds=CALC_SECS)
-        self.C = EXPLORE
+        self.C = CONF
 
         self.graph = None
         self.constraints = []
@@ -218,13 +220,30 @@ class Player:
 
         return pruned
     
+    def __update(self, state, score):
+        self.visits[state] += 1
+        self.vals[state] += score
+        delta = score - self.mean[state]
+        self.mean[state] += delta / self.visits[state]
+        self.m2[state] += delta**2
+
+    def __stdev(self, state):
+        count = self.visits[state]
+        if count < 2:
+            return 0
+        sample_var = self.m2[state] / (count - 1)
+
+        return np.sqrt(sample_var)
+
     def __simulate(self, state):
-        visits, vals, C = self.visits, self.vals, self.C
+        visits, vals, mean, m2, C = self.visits, self.vals, self.mean, self.m2, self.C
         visited = set()
         
         if state not in visits:
             visits[state] = 0
             vals[state] = 0
+            mean[state] = 0
+            m2[state] = 0
 
         expand = True
         while not (self.game.is_over(state)):
@@ -239,11 +258,10 @@ class Player:
                 next_states = self.__prune(hand, next_states)
 
             if not is_npc and all((s in visits) for p, s in next_states):
-                logN = np.log(max(visits.get(state, 0), 1))
-
                 _, move, state = max(
-                    ((vals[s] / visits[s]) +
-                     C * np.sqrt(logN / visits[s]), p, s)
+                    (mean[s] +
+                     C * self.__stdev(s) / 
+                     max(np.sqrt(visits[s]), 1), p, s)
                     for p, s in next_states
                 )
             else:
@@ -255,6 +273,8 @@ class Player:
                 expand = False
                 visits[state] = 0
                 vals[state] = 0
+                mean[state] = 0
+                m2[state] = 0
             
             visited.add(state)
 
@@ -264,8 +284,7 @@ class Player:
         for s in visited:
             if s not in visits:
                 continue
-            visits[s] += 1
-            vals[s] += score
+            self.__update(s, score)
                
     def __encode_state(self, state, cards):
         hand = frozenset(cards) - frozenset(state)
