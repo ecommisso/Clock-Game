@@ -10,7 +10,7 @@ import string
 # Constants
 CALC_SECS = 1
 EXPLORE = np.sqrt(2)
-PENALTY = 1
+PENALTY = 5
 
 @dataclass(order=True)
 class Constraint:
